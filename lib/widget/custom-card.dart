@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vibration/vibration.dart';
 
 class CustomCard extends StatelessWidget {
   CustomCard({
@@ -61,7 +62,7 @@ class CustomCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 8),
               Text(
                 title,
                 style: TextStyle(
@@ -76,6 +77,8 @@ class CustomCard extends StatelessWidget {
                   color: descriptionColor,
                   fontSize: 14,
                 ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -99,7 +102,13 @@ class CustomCard extends StatelessWidget {
     return Padding(
       padding: padding,
       child: GestureDetector(
-        onTap: onTap,
+        onTap: () async {
+          if (await Vibration.hasVibrator() ?? false) {
+            Vibration.vibrate(duration: 30);
+          }
+
+          onTap();
+        },
         child: Container(
           width: width,
           height: height,
