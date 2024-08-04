@@ -2,22 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
 
 class CustomCard extends StatelessWidget {
-  CustomCard({
+  const CustomCard({
     super.key,
     required this.width,
-    required this.height,
+    required this.minHeight,
     required this.title,
-    required this.description,
+    this.description = '',
     required this.imageUrl,
     this.backgroundColor = Colors.white,
     this.titleColor = Colors.black,
     this.descriptionColor = Colors.black,
-    this.padding = const EdgeInsets.all(16),
     required this.onTap,
+    this.padding = const EdgeInsets.all(0),
+    this.vibration = true,
+    this.child,
   });
 
   final double width;
-  final double height;
+  final double minHeight;
   final String title;
   final String description;
   final String imageUrl;
@@ -26,11 +28,14 @@ class CustomCard extends StatelessWidget {
   final Color descriptionColor;
   final EdgeInsetsGeometry padding;
   final void Function() onTap;
+  final Widget? child;
+  final bool vibration;
 
   @override
   Widget build(BuildContext context) {
     Widget squareCard = Column(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           title,
@@ -43,7 +48,8 @@ class CustomCard extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        Expanded(
+        SizedBox(
+          width: 100,
           child: AspectRatio(
             aspectRatio: 1.0,
             child: Image.asset(
@@ -55,77 +61,83 @@ class CustomCard extends StatelessWidget {
       ],
     );
 
-    Widget rectangleCard = Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    Widget rectangleCard = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  color: titleColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                description,
-                style: TextStyle(
-                  color: descriptionColor,
-                  fontSize: 14,
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SizedBox(
-            width: width / 3.2,
-            child: AspectRatio(
-              aspectRatio: 1.0,
-              child: Image.asset(
-                imageUrl,
-                fit: BoxFit.fitWidth,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: titleColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      color: descriptionColor,
+                      fontSize: 14,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: 100,
+                child: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Image.asset(
+                    imageUrl,
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
+        if (child != null) child!,
       ],
     );
-
     return Padding(
       padding: padding,
       child: GestureDetector(
         onTap: () async {
-          if (await Vibration.hasVibrator() ?? false) {
-            Vibration.vibrate(duration: 30);
+          if (vibration && (await Vibration.hasVibrator() ?? false)) {
+            Vibration.vibrate(duration: 20);
           }
-
           onTap();
         },
         child: Container(
-          width: width,
-          height: height,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 8,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: (width > 250) ? rectangleCard : squareCard,
-        ),
+            width: width,
+            //height: height, // this
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: minHeight),
+              child: (width > 250) ? rectangleCard : squareCard,
+            )),
       ),
     );
   }
