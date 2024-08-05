@@ -180,7 +180,7 @@ class ReviewScreen extends StatelessWidget {
                         onTap: () {
                           print('Biển báo');
                         }),
-                    const SizedBox(height: 100),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),

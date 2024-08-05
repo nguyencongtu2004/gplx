@@ -115,9 +115,9 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
         destinations: allDestinations.map<NavigationDestination>(
               (Destination destination) {
             return NavigationDestination(
-              icon: Icon(destination.icon, color: destination.color),
+              icon: Icon(destination.icon, color: destination.color, size: 35),
               label: destination.title,
-              selectedIcon: Icon(destination.selectedIcon, color: destination.color),
+              selectedIcon: Icon(destination.selectedIcon, color: destination.color, size: 35),
               tooltip: destination.title,
             );
           },
@@ -156,7 +156,7 @@ class _DestinationViewState extends State<DestinationView> {
               case 1:
                 return const ReviewScreen();
               case 2:
-                return const ProfileScreen();
+                return ProfileScreen();
             }
             return const SizedBox();
           },
