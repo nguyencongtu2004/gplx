@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../widget/custom-card.dart';
+import '../widget/custom_card.dart';
 
 class ReviewScreen extends StatelessWidget {
   const ReviewScreen({super.key});

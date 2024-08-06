@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gplx/screen/tabs-screen.dart';
+import 'package:gplx/screen/tabs_screen.dart';
 
 void main() {
   runApp(const GPLXApp());

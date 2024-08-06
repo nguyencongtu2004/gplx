@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gplx/screen/home-screen.dart';
-import 'package:gplx/screen/profile-screen.dart';
-import 'package:gplx/screen/review-screen.dart';
+import 'package:gplx/screen/home_screen.dart';
+import 'package:gplx/screen/profile_screen.dart';
+import 'package:gplx/screen/review_screen.dart';
 
 class Destination {
   const Destination(this.index, this.title, this.icon, this.selectedIcon, this.color);
@@ -105,6 +105,8 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
         }).toList(),
       ),
       bottomNavigationBar: NavigationBar(
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        height: 60,
         indicatorColor: allDestinations[selectedIndex].color.withOpacity(0.1),
         selectedIndex: selectedIndex,
         onDestinationSelected: (int index) {

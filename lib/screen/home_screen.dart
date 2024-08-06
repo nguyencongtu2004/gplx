@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gplx/widget/custom-card.dart';
+import 'package:gplx/screen/learn_screen.dart';
+import 'package:gplx/widget/custom_card.dart';
 import 'package:gplx/widget/topic.dart';
 import 'package:vibration/vibration.dart';
 
@@ -174,6 +175,9 @@ class HomeScreen extends StatelessWidget {
                             backgroundProgressColor: const Color(0xFF59D3AE),
                             onTap: () {
                               print('Câu hỏi điểm liệt');
+                              // test
+                              Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => LearnScreen()));
+
                             },
                           ),
                       ],

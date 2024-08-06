@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gplx/widget/information.dart';
 
-import 'chose-licence-class-screen.dart';
+import 'chose_licence_class_screen.dart';
 
 class ItemInList {
   final String title;
@@ -57,6 +57,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void onChangeLicense() {
+
       Navigator.of(context).push(MaterialPageRoute(
           builder: (ctx) => ChoseLicencesClassScreen()));
     }
