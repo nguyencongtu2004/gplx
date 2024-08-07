@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gplx/screen/learn_screen.dart';
 import 'package:gplx/widget/custom_card.dart';
 import 'package:gplx/widget/topic.dart';
@@ -176,8 +177,8 @@ class HomeScreen extends StatelessWidget {
                             onTap: () {
                               print('Câu hỏi điểm liệt');
                               // test
-                              Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => LearnScreen()));
-
+                              //Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => LearnScreen()));
+                              context.push('/learn');
                             },
                           ),
                       ],
