@@ -5,6 +5,7 @@ import 'package:gplx/screen/home_screen.dart';
 import 'package:gplx/screen/learn_screen.dart';
 import 'package:gplx/screen/profile_screen.dart';
 import 'package:gplx/screen/review_screen.dart';
+import 'package:gplx/screen/splash_screen.dart';
 
 class RoutePage {
   const RoutePage(this.index, this.route, this.title, this.icon, this.selectedIcon, this.color);
@@ -25,7 +26,7 @@ const List<RoutePage> allRoutePages = [
 
 final GoRouter router = GoRouter(
   debugLogDiagnostics: true,
-  initialLocation: '/home',
+  initialLocation: '/splash',
   navigatorKey: GlobalKey<NavigatorState>(),
   routes: [
     StatefulShellRoute.indexedStack(
@@ -89,6 +90,9 @@ final GoRouter router = GoRouter(
       },
     ),
     // Các màn hình khác
+    GoRoute(path: '/splash', builder: (context, state) {
+      return const SplashScreen();
+    }),
     GoRoute(path: '/learn', builder: (context, state) {
       return LearnScreen();
     }),

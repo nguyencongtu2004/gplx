@@ -42,7 +42,7 @@ class ExplanationItem extends StatelessWidget {
             'Giải thích:',
             style: TextStyle(
               color: Colors.black,
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -51,7 +51,7 @@ class ExplanationItem extends StatelessWidget {
             explanation,
             style: TextStyle(
               color: Colors.black,
-              fontSize: 14,
+              fontSize: 16,
             ),
           ),
         ],

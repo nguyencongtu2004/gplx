@@ -17,7 +17,7 @@ class AnswerItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
         color: answerState == AnswerState.none
             ? Colors.transparent
             : answerState == AnswerState.correct
@@ -39,7 +39,7 @@ class AnswerItem extends StatelessWidget {
             Expanded(
               child: Text(
                 answer,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black ,
                   fontSize: 16,
                 ),

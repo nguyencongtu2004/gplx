@@ -1,25 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gplx/model/question.dart';
+import 'package:gplx/provider/question_provider.dart';
 import 'package:gplx/widget/answer_item.dart';
 import 'package:gplx/widget/explanation_item.dart';
+import 'package:gplx/database/questions_table.dart';
 
-class QuestionAnswer extends StatelessWidget {
-  QuestionAnswer({super.key});
+class QuestionAnswer extends ConsumerStatefulWidget {
+  const QuestionAnswer({
+    super.key,
+    required this.chapter,
+  });
 
-  final int questionNumber = 1;
-  final int totalQuestion = 60;
-  final bool isSaved = false;
-  final String question = 'Hành vi nào dưới đây bị nghiêm cấm?';
-  final List<String> answers = [
-    '1 - Đỗ xe trên hè phố',
-    '2- Sử dụng xe đạp đi trên các tuyến quốc lộ có tốc độ cao',
-    '3 - Làm hỏng (cố ý) cọc tiêu, gương cầu, dải phân cách',
-    '4 - Sử dụng còi và quay đầu xe trong khu vực dân cư',
-  ];
-  final int correctAnswer = 2;
-  final String explanation =
-      'Hành vi phá hoại tài sản như cọc tiêu, gương cầu,... bị nghiêm cấm';
+  final int chapter;
 
-  final isCorrect = false;
+  @override
+  ConsumerState<QuestionAnswer> createState() => _QuestionAnswerState();
+}
+
+class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
+  late final Question currentQuestion;
+  late final List<Question> allQuestions;
+
+  late final int totalQuestion;
+  var currentShowIndex = 0;
+  var isSaved = false;
+  var isCorrect = false;
+
+  @override
+  void initState() {
+    super.initState();
+    allQuestions = ref.read(questionProvider).where((question) => question.chapter == widget.chapter).toList();
+
+    totalQuestion = allQuestions.length;
+    print('Tổng số câu hỏi: $totalQuestion');
+    setState(() {
+      currentQuestion = allQuestions[currentShowIndex];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +55,8 @@ class QuestionAnswer extends StatelessWidget {
                     children: [
                       Icon(Icons.thunderstorm),
                       SizedBox(width: 8),
-                      Text('Câu $questionNumber/$totalQuestion',
-                          style: TextStyle(
+                      Text('Câu ${currentQuestion.id}?/$totalQuestion',
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 12,
                           )),
@@ -56,10 +74,10 @@ class QuestionAnswer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
-              question,
+              currentQuestion.question,
               style: const TextStyle(
                 color: Colors.black,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -70,7 +88,8 @@ class QuestionAnswer extends StatelessWidget {
           ),
           // Câu trả lời
           Column(
-            children: answers
+            children: currentQuestion.answers
+                //.where((answer) => answer.isNotEmpty)
                 .map((answer) => AnswerItem(
                     answer: answer,
                     answerState: AnswerState.none,
@@ -81,9 +100,9 @@ class QuestionAnswer extends StatelessWidget {
           ),
           // Giải thích
           const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: const Text(
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
               'Kết quả',
               style: TextStyle(
                 color: Colors.black,
@@ -97,8 +116,8 @@ class QuestionAnswer extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: ExplanationItem(
               isCorrect: isCorrect,
-              explanation: explanation,
-              correctAnswer: correctAnswer,
+              explanation: currentQuestion.explanation,
+              correctAnswer: currentQuestion.correctAnswer,
             ),
           ),
         ],
