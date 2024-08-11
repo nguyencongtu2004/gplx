@@ -28,4 +28,4 @@ final questionProvider =
     StateNotifierProvider<QuestionProvider, List<Question>>(
         (ref) => QuestionProvider());
 
-
+final currentQuestionProvider = StateProvider<int>((ref) => 0);

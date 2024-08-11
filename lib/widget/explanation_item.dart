@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:gplx/widget/answer_item.dart';
 
 class ExplanationItem extends StatelessWidget {
-  ExplanationItem({
+  const ExplanationItem({
     super.key,
     required this.explanation,
-    required this.isCorrect,
+    required this.answerState,
     required this.correctAnswer,
   });
 
   final String explanation;
-  final bool isCorrect;
+  final AnswerState answerState;
   final int correctAnswer;
 
   @override
@@ -17,7 +18,7 @@ class ExplanationItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isCorrect ? Color(0xFFCFF5DE) : Color(0xFFFFCECE),
+        color: answerState == AnswerState.correct ? const Color(0xFFCFF5DE) : const Color(0xFFFFCECE),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -25,11 +26,11 @@ class ExplanationItem extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(isCorrect ? Icons.check_circle : Icons.cancel),
+              Icon(answerState == AnswerState.correct ? Icons.check_circle : Icons.cancel),
               const SizedBox(width: 8),
               Text(
-                isCorrect ? 'ĐÚNG' : 'SAI - Đáp án đúng là số ${correctAnswer + 1}',
-                style: TextStyle(
+                answerState == AnswerState.correct ? 'ĐÚNG' : 'SAI - Đáp án đúng là số $correctAnswer',
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -38,7 +39,7 @@ class ExplanationItem extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'Giải thích:',
             style: TextStyle(
               color: Colors.black,
@@ -49,7 +50,7 @@ class ExplanationItem extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             explanation,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.black,
               fontSize: 16,
             ),
