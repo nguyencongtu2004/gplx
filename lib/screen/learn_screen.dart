@@ -4,7 +4,9 @@ import 'package:gplx/model/question.dart';
 import 'package:gplx/widget/question_answer.dart';
 import 'package:gplx/widget/question_item.dart';
 
+import '../model/question_state.dart';
 import '../provider/question_provider.dart';
+import '../widget/answer_item.dart';
 
 class LearnScreen extends ConsumerStatefulWidget {
   const LearnScreen({
@@ -22,6 +24,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
   var currentQuestionIndex = 0;
   final _pageController = PageController();
   late final List<Question> allQuestions;
+  late final List<QuestionState> questionStates;
   late final int totalQuestion;
   late final int lastQuestionIndex;
 
@@ -57,6 +60,8 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
             .where((question) => question.chapter == widget.chapter)
             .toList();
     }
+    questionStates = List.generate(allQuestions.length,
+        (index) => QuestionState(isSaved: allQuestions[index].isSaved, answerState: AnswerState.none));
     totalQuestion = allQuestions.length;
   }
 
@@ -217,6 +222,12 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
               currentQuestion: allQuestions[i],
               currentQuestionIndex: i + 1,
               totalQuestion: totalQuestion,
+              questionState: questionStates[i],
+              onStateChanged: (newState) {
+                setState(() {
+                  questionStates[i] = newState;
+                });
+              },
             )
         ]));
   }

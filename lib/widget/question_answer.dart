@@ -5,6 +5,7 @@ import 'package:gplx/widget/answer_item.dart';
 import 'package:gplx/widget/explanation_item.dart';
 import 'package:vibration/vibration.dart';
 
+import '../model/question_state.dart';
 import '../provider/question_provider.dart';
 
 class QuestionAnswer extends ConsumerStatefulWidget {
@@ -13,37 +14,45 @@ class QuestionAnswer extends ConsumerStatefulWidget {
     required this.currentQuestion,
     required this.totalQuestion,
     required this.currentQuestionIndex,
+    required this.questionState,
+    required this.onStateChanged,
   });
 
   final Question currentQuestion;
   final int totalQuestion;
   final int currentQuestionIndex;
+  final QuestionState questionState;
+  final ValueChanged<QuestionState> onStateChanged;
 
   @override
   ConsumerState<QuestionAnswer> createState() => _QuestionAnswerState();
 }
 
 class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
-  late bool isSaved;
-  var answerState = AnswerState.none;
-  int? wrongAnswer;
+  late QuestionState _currentState;
 
   @override
   void initState() {
     super.initState();
-    isSaved = widget.currentQuestion.isSaved;
+    _currentState = widget.questionState;
   }
 
+  void updateState(QuestionState newState) {
+    setState(() {});
+    widget.onStateChanged(newState);
+  }
+
+
   Future<void> onAnswer(int answeredIndex) async {
-    if (answerState != AnswerState.none) {
+    if (_currentState.answerState != AnswerState.none) {
       return;
     }
     final correctAnswerIndex = widget.currentQuestion.correctAnswer - 1;
     if (answeredIndex == correctAnswerIndex) {
-      answerState = AnswerState.correct;
+      _currentState.answerState = AnswerState.correct;
     } else {
-      answerState = AnswerState.wrong;
-      wrongAnswer = answeredIndex;
+      _currentState.answerState = AnswerState.wrong;
+      _currentState.wrongAnswer = answeredIndex;
     }
 
     if (await Vibration.hasVibrator() ?? false) {
@@ -51,14 +60,15 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
     }
 
     // Cập nhật trạng thái của câu trả lời
-    setState(() {});
+    updateState(_currentState);
   }
 
   Future<void> onSaved() async {
     await ref.read(questionProvider.notifier).questionSavedChange(widget.currentQuestion.id);
-    setState(() {
-      isSaved = !isSaved;
-    });
+    _currentState.isSaved = !_currentState.isSaved;
+
+    // Cập nhật trạng thái của câu trả lời
+    updateState(_currentState);
   }
 
   @override
@@ -68,13 +78,13 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
     final currentQuestionIndex = widget.currentQuestionIndex;
 
     AnswerState getAnswerState(int index) {
-      if (answerState == AnswerState.none) {
+      if (_currentState.answerState == AnswerState.none) {
         return AnswerState.none;
       }
       if (index == widget.currentQuestion.correctAnswer - 1) {
         return AnswerState.correct;
       }
-      if (index == wrongAnswer) {
+      if (index == _currentState.wrongAnswer) {
         return AnswerState.wrong;
       }
       return AnswerState.none;
@@ -107,8 +117,8 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                 IconButton(
                     onPressed: onSaved,
                     icon: Icon(
-                      isSaved ? Icons.bookmark : Icons.bookmark_outline,
-                      color: isSaved ? Colors.green : Colors.black,
+                      _currentState.isSaved ? Icons.bookmark : Icons.bookmark_outline,
+                      color: _currentState.isSaved ? Colors.green : Colors.black,
                     )),
               ],
             ),
@@ -152,7 +162,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
             }).toList(),
           ),
           // Giải thích
-          if (answerState != AnswerState.none) ...[
+          if (_currentState.answerState != AnswerState.none) ...[
             const SizedBox(height: 16),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 8),
@@ -169,7 +179,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: ExplanationItem(
-                answerState: answerState,
+                answerState: _currentState.answerState,
                 explanation: currentQuestion.explanation,
                 correctAnswer: currentQuestion.correctAnswer,
               ),
