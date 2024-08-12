@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/model/question.dart';
 import 'package:gplx/widget/answer_item.dart';
 import 'package:gplx/widget/explanation_item.dart';
+import 'package:vibration/vibration.dart';
+
+import '../provider/question_provider.dart';
 
 class QuestionAnswer extends ConsumerStatefulWidget {
   const QuestionAnswer({
@@ -21,16 +24,17 @@ class QuestionAnswer extends ConsumerStatefulWidget {
 }
 
 class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
-  var isSaved = false;
+  late bool isSaved;
   var answerState = AnswerState.none;
   int? wrongAnswer;
 
   @override
   void initState() {
     super.initState();
+    isSaved = widget.currentQuestion.isSaved;
   }
 
-  void onAnswer(int answeredIndex) {
+  Future<void> onAnswer(int answeredIndex) async {
     if (answerState != AnswerState.none) {
       return;
     }
@@ -41,13 +45,20 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
       answerState = AnswerState.wrong;
       wrongAnswer = answeredIndex;
     }
+
+    if (await Vibration.hasVibrator() ?? false) {
+    Vibration.vibrate(duration: 20);
+    }
+
     // Cập nhật trạng thái của câu trả lời
     setState(() {});
   }
 
-  onSaved() {
-    isSaved = !isSaved;
-    setState(() {});
+  Future<void> onSaved() async {
+    await ref.read(questionProvider.notifier).questionSavedChange(widget.currentQuestion.id);
+    setState(() {
+      isSaved = !isSaved;
+    });
   }
 
   @override

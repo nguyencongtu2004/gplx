@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gplx/screen/learn_screen.dart';
 import 'package:gplx/widget/custom_card.dart';
 import 'package:gplx/widget/topic.dart';
 import 'package:vibration/vibration.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   static const topic = {
@@ -22,7 +21,14 @@ class HomeScreen extends ConsumerWidget {
   };
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  var isShowTopic = false;
+
+  @override
+  Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         body: SingleChildScrollView(
@@ -116,9 +122,14 @@ class HomeScreen extends ConsumerWidget {
                     imageUrl: 'assets/images/place-holder.png',
                     backgroundColor: const Color(0xFFBEFFE7),
                     titleColor: const Color(0xFF011D26),
-                    vibration: false,
-                    onTap: () {
+                    vibration: true,
+                    onTap: () async {
                       print('Truyền thống');
+                      if (await Vibration.hasVibrator() ?? false) {
+                      Vibration.vibrate(duration: 20);
+                      }
+                      print('Tất cả câu hỏi');
+                      context.push('/learn/-1');
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,12 +156,16 @@ class HomeScreen extends ConsumerWidget {
                             ],
                           ),
                         ),
+                        if (isShowTopic == false)
                         ElevatedButton(
                           onPressed: () async {
                             if (await Vibration.hasVibrator() ?? false) {
-                            Vibration.vibrate(duration: 20);
+                              Vibration.vibrate(duration: 20);
                             }
                             print('Học theo chủ đề');
+                            setState(() {
+                              isShowTopic = true;
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: const Color(0xFF011D26),
@@ -165,7 +180,8 @@ class HomeScreen extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        if (isShowTopic)
+                        ...[const SizedBox(height: 8),
                         const Text(
                           'Các chủ đề',
                           style: TextStyle(
@@ -177,7 +193,7 @@ class HomeScreen extends ConsumerWidget {
                         for (int i = 0; i <= 7; i++)
                           Topic(
                             padding: const EdgeInsets.symmetric(vertical: 8),
-                            title: topic[i]!,
+                            title: HomeScreen.topic[i]!,
                             imageUrl: 'assets/images/place-holder.png',
                             progress: 0.5,
                             correctQuestion: 10,
@@ -189,15 +205,36 @@ class HomeScreen extends ConsumerWidget {
                             progressColor: const Color(0xFF0A6F4E),
                             backgroundProgressColor: const Color(0xFF59D3AE),
                             onTap: () {
-                              print(topic[i]);
+                              print(HomeScreen.topic[i]);
                               // test
                               //Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => LearnScreen()));
                               context.push('/learn/$i');
                             },
                           ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (await Vibration.hasVibrator() ?? false) {
+                                  Vibration.vibrate(duration: 20);
+                                }
+                                print('Ẩn chủ đề');
+                                setState(() {
+                                  isShowTopic = false;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: const Color(0xFF011D26),
+                                backgroundColor: const Color(0xFF73F6B7),
+                              ),
+                              child: const Text('Ẩn chủ đề'),
+                            ),
+                          ),
+                        ]
                       ],
                     )),
-                const SizedBox(height: 16),],
+                const SizedBox(height: 16),
+              ],
             ),
           ),
         ],

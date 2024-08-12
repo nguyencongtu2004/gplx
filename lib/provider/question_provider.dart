@@ -22,10 +22,16 @@ class QuestionProvider extends StateNotifier<List<Question>> {
       print('Lỗi load câu hỏi từ DB: $e');
     }
   }
+
+  Future<void> questionSavedChange(int questionId) async {
+    final questionIndex = state.indexWhere((question) => question.id == questionId);
+    final updatedQuestion = state[questionIndex].copyWith(isSaved: !state[questionIndex].isSaved);
+    state[questionIndex] = updatedQuestion;
+
+    await QuestionsTable.updateQuestionSaved(questionId, updatedQuestion.isSaved);
+  }
 }
 
 final questionProvider =
     StateNotifierProvider<QuestionProvider, List<Question>>(
         (ref) => QuestionProvider());
-
-final currentQuestionProvider = StateProvider<int>((ref) => 0);

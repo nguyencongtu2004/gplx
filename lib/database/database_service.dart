@@ -45,7 +45,10 @@ class DatabaseService {
         image TEXT,
         chapter INTEGER,
         isFailingPoint INTEGER,
-        otomotoExplanation TEXT
+        otomotoExplanation TEXT,
+        isHard INTEGER,
+        isSaved INTEGER,
+        questionStatus INTEGER
       )
     ''');
     await db.execute('''

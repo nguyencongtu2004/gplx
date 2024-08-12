@@ -23,13 +23,25 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
   final _pageController = PageController();
   late final List<Question> allQuestions;
   late final int totalQuestion;
-  late final lastQuestionIndex;
+  late final int lastQuestionIndex;
 
   @override
   void initState() {
     super.initState();
 
     switch (widget.chapter) {
+      case -3:
+        allQuestions = ref
+            .read(questionProvider)
+            .where((question) => question.isHard)
+            .toList();
+        break;
+      case -2:
+        allQuestions = ref
+            .read(questionProvider)
+            .where((question) => question.isSaved)
+            .toList();
+        break;
       case -1:
         allQuestions = ref.read(questionProvider);
         break;

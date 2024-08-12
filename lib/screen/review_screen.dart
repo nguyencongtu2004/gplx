@@ -1,10 +1,28 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widget/custom_card.dart';
 
-class ReviewScreen extends StatelessWidget {
+class ReviewScreen extends ConsumerStatefulWidget {
   const ReviewScreen({super.key});
+
+  @override
+  ConsumerState<ReviewScreen> createState() => _ReviewScreenState();
+}
+
+class _ReviewScreenState extends ConsumerState<ReviewScreen> {
+
+  void onSavedQuestionClick() {
+    print('Câu hỏi đã lưu');
+    context.push('/learn/-2');
+  }
+
+  void onHardQuestionClick() {
+    print('Câu hỏi khó');
+    context.push('/learn/-3');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,9 +112,7 @@ class ReviewScreen extends StatelessWidget {
                         backgroundColor: const Color(0xFAE0FFFA),
                         titleColor: const Color(0xFF00697F),
                         descriptionColor: const Color(0xFF51A7BF),
-                        onTap: () {
-                          print('Câu hỏi đã lưu');
-                        }),
+                        onTap: onSavedQuestionClick),
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -121,9 +137,7 @@ class ReviewScreen extends StatelessWidget {
                               imageUrl: 'assets/images/place-holder.png',
                               backgroundColor: const Color(0xFFFFCECE),
                               titleColor: const Color(0xFFA71F2A),
-                              onTap: () {
-                                print('Câu hỏi khó');
-                              }),
+                              onTap: onHardQuestionClick),
                         ),
                       ],
                     ),

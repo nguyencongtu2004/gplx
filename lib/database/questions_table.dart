@@ -8,29 +8,16 @@ class QuestionsTable {
     return db!.query('questions');
   }
 
-  // Hàm lấy câu hỏi theo id
-  static Future<Map<String, dynamic>> getQuestionById(int id) async {
+  // Hàm cập nhật trạng thái lưu của câu hỏi
+  static Future<void> updateQuestionSaved(int questionId, bool isSaved) async {
     final db = await DatabaseService().database;
-    final data = await db!.query('questions', where: 'id = ?', whereArgs: [id]);
-    return data[0];
+    await db!.update(
+      'questions',
+      {'isSaved': isSaved ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [questionId],
+    );
+    print('Updated question $questionId saved to $isSaved');
   }
 
-  // Hàm lấy câu hỏi theo chapter
-  static Future<List<Map<String, dynamic>>> getQuestionsByChapter(int chapter) async {
-    final db = await DatabaseService().database;
-    return db!.query('questions', where: 'chapter = ?', whereArgs: [chapter]);
-  }
-
-  // Hàm lấy câu hỏi theo chapter và điểm liệt
-  static Future<List<Map<String, dynamic>>> getFailingPointQuestionsByChapter(int chapter) async {
-    final db = await DatabaseService().database;
-    return db!.query('questions', where: 'chapter = ? AND isFailingPoint = 1', whereArgs: [chapter]);
-  }
-
-  // Hàm lấy số lượng câu hỏi theo chapter
-  static Future<int> getQuestionCountByChapter(int chapter) async {
-    final db = await DatabaseService().database;
-    final data = await db!.query('questions', where: 'chapter = ?', whereArgs: [chapter]);
-    return data.length;
-  }
 }
