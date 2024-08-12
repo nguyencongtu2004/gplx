@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/model/question.dart';
 import 'package:gplx/widget/question_answer.dart';
+import 'package:gplx/widget/question_item.dart';
 
 import '../provider/question_provider.dart';
 
@@ -33,10 +34,16 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
         allQuestions = ref.read(questionProvider);
         break;
       case 0:
-        allQuestions = ref.read(questionProvider).where((question) => question.isFailingPoint).toList();
+        allQuestions = ref
+            .read(questionProvider)
+            .where((question) => question.isFailingPoint)
+            .toList();
         break;
       default:
-        allQuestions = ref.read(questionProvider).where((question) => question.chapter == widget.chapter).toList();
+        allQuestions = ref
+            .read(questionProvider)
+            .where((question) => question.chapter == widget.chapter)
+            .toList();
     }
     totalQuestion = allQuestions.length;
   }
@@ -51,6 +58,12 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
     print('Next click');
     _pageController.nextPage(
         duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
+  }
+
+  void onQuestionChange(int newQuestionIndex) {
+    _pageController.animateToPage(newQuestionIndex,
+        duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    Navigator.pop(context);
   }
 
   void showCustomBottomSheet(BuildContext context) {
@@ -78,15 +91,35 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
               ),
               child: ListView(
                 controller: scrollController,
-                children: <Widget>[
-                  // Nội dung của BottomSheet
-                  for (int i = 0; i < 20; i++)
-                    ListTile(
-                      leading: Icon(Icons.info),
-                      title: Text('Thông tin $i'),
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text(
+                      'Danh sách câu hỏi',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-
-                  // Thêm các mục khác tại đây
+                  ),
+                  // Nội dung của BottomSheet
+                  for (int i = 0; i < totalQuestion; i++) ...[
+                    QuestionItem(
+                      question: allQuestions[i],
+                      index: i,
+                      onTap: () {
+                        onQuestionChange(i);
+                      },
+                    ),
+                    if (i != totalQuestion - 1)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Divider(),
+                      ),
+                  ],
+                  const SizedBox(height: 16),
                 ],
               ),
             );
