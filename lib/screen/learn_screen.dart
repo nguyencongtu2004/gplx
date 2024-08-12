@@ -1,40 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gplx/model/question.dart';
 import 'package:gplx/widget/question_answer.dart';
 
 import '../provider/question_provider.dart';
 
 class LearnScreen extends ConsumerStatefulWidget {
-  const LearnScreen({super.key});
+  const LearnScreen({
+    super.key,
+    required this.chapter,
+  });
+
+  final int chapter;
 
   @override
   ConsumerState<LearnScreen> createState() => _LearnScreenState();
 }
 
 class _LearnScreenState extends ConsumerState<LearnScreen> {
-
-  var currentQuestion = 0;
+  var currentQuestionIndex = 0;
+  final _pageController = PageController();
+  late final List<Question> allQuestions;
+  late final int totalQuestion;
+  late final lastQuestionIndex;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
+    switch (widget.chapter) {
+      case -1:
+        allQuestions = ref.read(questionProvider);
+        break;
+      case 0:
+        allQuestions = ref.read(questionProvider).where((question) => question.isFailingPoint).toList();
+        break;
+      default:
+        allQuestions = ref.read(questionProvider).where((question) => question.chapter == widget.chapter).toList();
+    }
+    totalQuestion = allQuestions.length;
   }
 
   void onPreviousClick() {
     print('Previous click');
-    if (currentQuestion > 0) {
-      currentQuestion -= 1;
-    }
-    setState(() {});
+    _pageController.previousPage(
+        duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
   }
 
   void onNextClick() {
     print('Next click');
-    if (currentQuestion < ref.read(questionProvider).length - 1) {
-      currentQuestion += 1;
-    }
-    setState(() {});
+    _pageController.nextPage(
+        duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
   }
 
   void showCustomBottomSheet(BuildContext context) {
@@ -149,10 +165,14 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
                 )),
               ],
             )),
-        body: QuestionAnswer(
-          key: ValueKey(ref.read(questionProvider)[currentQuestion].id),
-          currentQuestion: ref.read(questionProvider)[currentQuestion],
-          totalQuestion: ref.read(questionProvider).length,
-        ));
+        body: PageView(controller: _pageController, children: [
+          for (int i = 0; i < totalQuestion; i++)
+            QuestionAnswer(
+              key: ValueKey(allQuestions[i].id),
+              currentQuestion: allQuestions[i],
+              currentQuestionIndex: i + 1,
+              totalQuestion: totalQuestion,
+            )
+        ]));
   }
 }

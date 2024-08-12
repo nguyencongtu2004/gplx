@@ -93,8 +93,9 @@ final GoRouter router = GoRouter(
     GoRoute(path: '/splash', builder: (context, state) {
       return const SplashScreen();
     }),
-    GoRoute(path: '/learn', builder: (context, state) {
-      return LearnScreen();
+    GoRoute(path: '/learn/:chapter', builder: (context, state) {
+      final chapter = int.parse(state.pathParameters['chapter']!);
+      return LearnScreen(chapter: chapter);
     }),
     GoRoute(path: '/chose-licence-class', builder: (context, state) {
       return ChoseLicencesClassScreen();

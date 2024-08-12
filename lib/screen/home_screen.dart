@@ -9,6 +9,18 @@ import 'package:vibration/vibration.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
+  static const topic = {
+    -1: 'Tất cả câu hỏi',
+    0: 'Câu hỏi điểm liệt',
+    1: 'Khái niệm và quy tắc',
+    2: 'Nghiệp vụ vận tải',
+    3: 'Văn hóa và đạo đức',
+    4: 'Kỹ thuật lái xe',
+    5: 'Cấu tạo và sửa chữa',
+    6: 'Biển báo đường bộ',
+    7: 'Sa hình',
+  };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -118,6 +130,7 @@ class HomeScreen extends ConsumerWidget {
                               Vibration.vibrate(duration: 20);
                             }
                             print('Tất cả câu hỏi');
+                            context.push('/learn/-1');
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: const Color(0xFF011D26),
@@ -153,18 +166,18 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
+                        const Text(
                           'Các chủ đề',
                           style: TextStyle(
-                            color: const Color(0xFF011D26),
+                            color: Color(0xFF011D26),
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        for (int i = 0; i < 6; i++)
+                        for (int i = 0; i <= 7; i++)
                           Topic(
                             padding: const EdgeInsets.symmetric(vertical: 8),
-                            title: 'Câu hỏi điểm liệt',
+                            title: topic[i]!,
                             imageUrl: 'assets/images/place-holder.png',
                             progress: 0.5,
                             correctQuestion: 10,
@@ -176,10 +189,10 @@ class HomeScreen extends ConsumerWidget {
                             progressColor: const Color(0xFF0A6F4E),
                             backgroundProgressColor: const Color(0xFF59D3AE),
                             onTap: () {
-                              print('Câu hỏi điểm liệt');
+                              print(topic[i]);
                               // test
                               //Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => LearnScreen()));
-                              context.push('/learn');
+                              context.push('/learn/$i');
                             },
                           ),
                       ],

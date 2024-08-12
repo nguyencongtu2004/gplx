@@ -9,10 +9,12 @@ class QuestionAnswer extends ConsumerStatefulWidget {
     super.key,
     required this.currentQuestion,
     required this.totalQuestion,
+    required this.currentQuestionIndex,
   });
 
   final Question currentQuestion;
   final int totalQuestion;
+  final int currentQuestionIndex;
 
   @override
   ConsumerState<QuestionAnswer> createState() => _QuestionAnswerState();
@@ -52,6 +54,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
   Widget build(BuildContext context) {
     final currentQuestion = widget.currentQuestion;
     final totalQuestion = widget.totalQuestion;
+    final currentQuestionIndex = widget.currentQuestionIndex;
 
     AnswerState getAnswerState(int index) {
       if (answerState == AnswerState.none) {
@@ -72,15 +75,17 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
               children: [
                 Expanded(
                   child: Row(
                     children: [
-                      const Icon(Icons.thunderstorm),
-                      const SizedBox(width: 8),
-                      Text('Câu ${currentQuestion.id}?/$totalQuestion',
+                      if (currentQuestion.isFailingPoint) ...[
+                        const Icon(Icons.thunderstorm),
+                        const SizedBox(width: 8)
+                      ],
+                      Text('Câu $currentQuestionIndex/$totalQuestion',
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 12,
@@ -109,10 +114,20 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Divider(),
-          ),
+          if (currentQuestion.image.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Divider(),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                'assets/data/images_of_question/${currentQuestion.id}.png',
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
           // Câu trả lời
           Column(
             children: currentQuestion.answers.map((answer) {
@@ -148,7 +163,8 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                 correctAnswer: currentQuestion.correctAnswer,
               ),
             ),
-          ]
+          ],
+          const SizedBox(height: 48),
         ],
       ),
     );
