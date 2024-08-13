@@ -5,6 +5,7 @@ import 'package:gplx/screen/home_screen.dart';
 import 'package:gplx/screen/learn_screen.dart';
 import 'package:gplx/screen/profile_screen.dart';
 import 'package:gplx/screen/review_screen.dart';
+import 'package:gplx/screen/signs_screen.dart';
 import 'package:gplx/screen/splash_screen.dart';
 
 class RoutePage {
@@ -99,6 +100,9 @@ final GoRouter router = GoRouter(
     }),
     GoRoute(path: '/chose-licence-class', builder: (context, state) {
       return ChoseLicencesClassScreen();
+    }),
+    GoRoute(path: '/signs', builder: (context, state) {
+      return const SignsScreen();
     }),
   ],
 );

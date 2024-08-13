@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../provider/question_provider.dart';
+import '../provider/sign_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -25,12 +27,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         return;
       }
       print('Dữ liệu câu hỏi đã được tải');
-      // Chuyển hướng tới màn hình chính
-        context.pushReplacement('/home');
     } catch (e) {
-      print('Error loading data: $e');
+      print('Lỗi load câu hỏi: $e');
       // Có thể hiển thị một thông báo lỗi hoặc thử tải lại dữ liệu
     }
+
+    try {
+      await ref.read(signProvider.notifier).loadSigns();
+      if (ref.read(signProvider).isEmpty) {
+        print('Không có dữ liệu biển báo');
+        return;
+      }
+      print('Dữ liệu biển báo đã được tải');
+    } catch (e) {
+      print('Lỗi load biển báo: $e');
+      // Có thể hiển thị một thông báo lỗi hoặc thử tải lại dữ liệu
+    }
+
+    // Chuyển hướng tới màn hình chính
+    context.pushReplacement('/home');
   }
 
   @override

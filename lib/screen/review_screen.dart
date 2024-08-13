@@ -24,6 +24,11 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     context.push('/learn/-3');
   }
 
+  void onSignsClick() {
+    print('Biển báo');
+    context.push('/signs');
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -141,40 +146,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 16),
-                    /*Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Expanded(
-                          child: CustomCard(
-                              width: screenWidth / 2,
-                              minHeight: 120,
-                              title: 'Câu hỏi khó',
-                              imageUrl: 'assets/images/place-holder.png',
-                              backgroundColor: const Color(0xFFFFCECE),
-                              titleColor: const Color(0xFFA71F2A),
-                              onTap: () {
-                                print('Câu hỏi khó');
-                              }),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: CustomCard(
-                              width: screenWidth,
-                              minHeight: 120,
-                              title: 'Câu hỏi chưa trả lời',
-                              description:
-                              'Những câu hỏi bạn chưa trả lời trong bài thi.',
-                              imageUrl: 'assets/images/place-holder.png',
-                              backgroundColor: const Color(0xFFE0F8FF),
-                              titleColor: const Color(0xFF005F6B),
-                              onTap: () {
-                                print('Câu hỏi chưa trả lời');
-                              }),
-                        ),
-                      ],
-                    ),*/
                     const Text(
                         'Biển báo',
                         style: TextStyle(
@@ -191,9 +163,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                         backgroundColor: const Color(0xFFBDFFE7),
                         titleColor: const Color(0xFF012504),
                         descriptionColor: Colors.black,
-                        onTap: () {
-                          print('Biển báo');
-                        }),
+                        onTap: onSignsClick),
                     const SizedBox(height: 16),
                   ],
                 ),

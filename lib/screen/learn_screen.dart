@@ -231,4 +231,10 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
             )
         ]));
   }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 }
