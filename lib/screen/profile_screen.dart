@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gplx/widget/information.dart';
 
-import 'chose_licence_class_screen.dart';
+import '../provider/license_class_provider.dart';
 
 class ItemInList {
   final String title;
@@ -16,7 +17,7 @@ class ItemInList {
   });
 }
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   ProfileScreen({super.key});
 
   final List<ItemInList> allSettings = [
@@ -56,9 +57,8 @@ class ProfileScreen extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     void onChangeLicense() {
-      //Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => ChoseLicencesClassScreen()));
       context.push('/chose-licence-class');
     }
 
@@ -99,9 +99,9 @@ class ProfileScreen extends StatelessWidget {
                   child: ListTile(
                     onTap: onChangeLicense,
                     leading: const Icon(Icons.star),
-                    title: const Text(
-                      'B1',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    title: Text(
+                      ref.watch(licenseClassProvider),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     trailing: const Row(
                       mainAxisSize: MainAxisSize.min,
