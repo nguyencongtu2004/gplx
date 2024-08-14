@@ -15,6 +15,14 @@ class QuestionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MaterialColor questionNumberColor;
+    if (question.questionStatus == QuestionStatus.correct) {
+      questionNumberColor = Colors.green;
+    } else if (question.questionStatus == QuestionStatus.wrong) {
+      questionNumberColor = Colors.red;
+    } else {
+      questionNumberColor = Colors.grey;
+    }
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -25,7 +33,7 @@ class QuestionItem extends StatelessWidget {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: Colors.grey,
+                color: questionNumberColor,
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Center(

@@ -14,6 +14,11 @@ class ReviewScreen extends ConsumerStatefulWidget {
 
 class _ReviewScreenState extends ConsumerState<ReviewScreen> {
 
+  void onWrongQuestionClick() {
+    print('Câu trả lời sai');
+    context.push('/learn/-4');
+  }
+
   void onSavedQuestionClick() {
     print('Câu hỏi đã lưu');
     context.push('/learn/-2');
@@ -129,9 +134,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                               imageUrl: 'assets/images/place-holder.png',
                               backgroundColor: const Color(0xFFFFE8CA),
                               titleColor: const Color(0xFFD15C28),
-                              onTap: () {
-                                print('Câu trả lời sai');
-                              }),
+                              onTap: onWrongQuestionClick),
                         ),
                         const SizedBox(width: 16),
                         Expanded(

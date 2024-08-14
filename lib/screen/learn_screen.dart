@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/model/question.dart';
+import 'package:gplx/provider/topic_provider.dart';
 import 'package:gplx/widget/question_answer.dart';
 import 'package:gplx/widget/question_item.dart';
 
@@ -21,18 +22,28 @@ class LearnScreen extends ConsumerStatefulWidget {
 }
 
 class _LearnScreenState extends ConsumerState<LearnScreen> {
-  var currentQuestionIndex = 0;
   final _pageController = PageController();
   late final List<Question> allQuestions;
   late final List<QuestionState> questionStates;
   late final int totalQuestion;
   late final int lastQuestionIndex;
 
+  // biến của UI
+  var isShowPreviousButton = false;
+  var isShowNextButton = true;
+
   @override
   void initState() {
     super.initState();
 
     switch (widget.chapter) {
+      case -4:
+        allQuestions = ref
+            .read(questionProvider)
+            .where(
+                (question) => question.questionStatus == QuestionStatus.wrong)
+            .toList();
+        break;
       case -3:
         allQuestions = ref
             .read(questionProvider)
@@ -60,8 +71,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
             .where((question) => question.chapter == widget.chapter)
             .toList();
     }
-    questionStates = List.generate(allQuestions.length,
-        (index) => QuestionState(isSaved: allQuestions[index].isSaved, answerState: AnswerState.none));
+    questionStates = List.generate(
+        allQuestions.length,
+        (index) => QuestionState(
+            isSaved: allQuestions[index].isSaved,
+            answerState: AnswerState.none));
     totalQuestion = allQuestions.length;
   }
 
@@ -150,86 +164,110 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Câu hỏi điểm liệt',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+          title: Center(
+            child: Text(
+              kTopic[widget.chapter] ?? 'Câu hỏi',
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           actions: [
             IconButton(
               onPressed: () {
+                if (totalQuestion == 0) return;
                 showCustomBottomSheet(context);
               },
               icon: const Icon(Icons.list),
             )
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-            color: const Color(0xFFBDFFE7),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            height: 50,
-            child: Row(
-              children: [
-                Expanded(
-                    child: MaterialButton(
-                  padding: const EdgeInsets.all(0),
-                  onPressed: onPreviousClick,
-                  splashColor: Colors.transparent,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.arrow_back_ios),
-                      Text(
-                        'Câu trước',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+        bottomNavigationBar: totalQuestion == 0
+            ? null
+            : BottomAppBar(
+                color: const Color(0xFFBDFFE7),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                height: 50,
+                child: Row(
+                  children: [
+                    if (isShowPreviousButton)
+                      Expanded(
+                          child: MaterialButton(
+                        padding: const EdgeInsets.all(0),
+                        onPressed: onPreviousClick,
+                        splashColor: Colors.transparent,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.arrow_back_ios),
+                            Text(
+                              'Câu trước',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                )),
-                Expanded(
-                    child: MaterialButton(
-                  padding: const EdgeInsets.all(0),
-                  onPressed: onNextClick,
-                  splashColor: Colors.transparent,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Câu sau ',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      )),
+                    if (isShowNextButton)
+                      Expanded(
+                          child: MaterialButton(
+                        padding: const EdgeInsets.all(0),
+                        onPressed: onNextClick,
+                        splashColor: Colors.transparent,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              'Câu sau ',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Icon(Icons.arrow_forward_ios)
+                          ],
                         ),
-                      ),
-                      Icon(Icons.arrow_forward_ios)
-                    ],
-                  ),
+                      )),
+                  ],
                 )),
-              ],
-            )),
-        body: PageView(controller: _pageController, children: [
-          for (int i = 0; i < totalQuestion; i++)
-            QuestionAnswer(
-              key: ValueKey(allQuestions[i].id),
-              currentQuestion: allQuestions[i],
-              currentQuestionIndex: i + 1,
-              totalQuestion: totalQuestion,
-              questionState: questionStates[i],
-              onStateChanged: (newState) {
-                setState(() {
-                  questionStates[i] = newState;
-                });
-              },
-            )
-        ]));
+        body: (totalQuestion == 0)
+            ? const Center(
+                child: Text(
+                'Không có câu hỏi',
+                style: TextStyle(
+                  fontSize: 14,
+                ),
+              ))
+            : PageView.builder(
+                controller: _pageController,
+                itemCount: totalQuestion,
+                itemBuilder: (context, index) {
+                  return QuestionAnswer(
+                    key: ValueKey(allQuestions[index].id),
+                    currentQuestion: allQuestions[index],
+                    currentQuestionIndex: index + 1,
+                    totalQuestion: totalQuestion,
+                    questionState: questionStates[index],
+                    onStateChanged: (newState) {
+                      setState(() {
+                        questionStates[index] = newState;
+                      });
+                    },
+                  );
+                },
+                onPageChanged: (index) {
+                  setState(() {
+                    isShowPreviousButton = index != 0;
+                    isShowNextButton = index != totalQuestion - 1;
+                  });
+                },
+              ));
   }
 
   @override

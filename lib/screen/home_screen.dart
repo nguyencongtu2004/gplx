@@ -5,20 +5,10 @@ import 'package:gplx/widget/custom_card.dart';
 import 'package:gplx/widget/topic.dart';
 import 'package:vibration/vibration.dart';
 
+import '../provider/topic_provider.dart';
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
-
-  static const topic = {
-    -1: 'Tất cả câu hỏi',
-    0: 'Câu hỏi điểm liệt',
-    1: 'Khái niệm và quy tắc',
-    2: 'Nghiệp vụ vận tải',
-    3: 'Văn hóa và đạo đức',
-    4: 'Kỹ thuật lái xe',
-    5: 'Cấu tạo và sửa chữa',
-    6: 'Biển báo đường bộ',
-    7: 'Sa hình',
-  };
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
@@ -193,7 +183,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         for (int i = 0; i <= 7; i++)
                           Topic(
                             padding: const EdgeInsets.symmetric(vertical: 8),
-                            title: HomeScreen.topic[i]!,
+                            title: kTopic[i]!,
                             imageUrl: 'assets/images/place-holder.png',
                             progress: 0.5,
                             correctQuestion: 10,
@@ -205,9 +195,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             progressColor: const Color(0xFF0A6F4E),
                             backgroundProgressColor: const Color(0xFF59D3AE),
                             onTap: () {
-                              print(HomeScreen.topic[i]);
-                              // test
-                              //Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => LearnScreen()));
+                              print(kTopic[i]);
                               context.push('/learn/$i');
                             },
                           ),

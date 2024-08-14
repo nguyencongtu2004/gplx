@@ -30,6 +30,15 @@ class QuestionProvider extends StateNotifier<List<Question>> {
 
     await QuestionsTable.updateQuestionSaved(questionId, updatedQuestion.isSaved);
   }
+
+  Future<void> questionStatusChange(int questionId, QuestionStatus status) async {
+    final questionIndex = state.indexWhere((question) => question.id == questionId);
+    final updatedQuestion = state[questionIndex].copyWith(questionStatus: status);
+    state[questionIndex] = updatedQuestion;
+
+    await QuestionsTable.updateQuestionStatus(questionId, status);
+  }
+
 }
 
 final questionProvider =

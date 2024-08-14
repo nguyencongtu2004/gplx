@@ -38,8 +38,10 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
   }
 
   void updateState(QuestionState newState) {
-    setState(() {});
-    widget.onStateChanged(newState);
+    setState(() {
+      _currentState = newState;
+    });
+    widget.onStateChanged(newState); // Notify the parent widget or any listeners
   }
 
 
@@ -47,16 +49,18 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
     if (_currentState.answerState != AnswerState.none) {
       return;
     }
-    final correctAnswerIndex = widget.currentQuestion.correctAnswer - 1;
-    if (answeredIndex == correctAnswerIndex) {
-      _currentState.answerState = AnswerState.correct;
-    } else {
-      _currentState.answerState = AnswerState.wrong;
-      _currentState.wrongAnswer = answeredIndex;
-    }
+    final isCorrect = answeredIndex == widget.currentQuestion.correctAnswer - 1;
+    _currentState.answerState = isCorrect ? AnswerState.correct : AnswerState.wrong;
+    _currentState.wrongAnswer = isCorrect ? -1 : answeredIndex;
+
+    await ref.read(questionProvider.notifier).questionStatusChange(
+        widget.currentQuestion.id,
+        _currentState.answerState == AnswerState.correct
+            ? QuestionStatus.correct
+            : QuestionStatus.wrong);
 
     if (await Vibration.hasVibrator() ?? false) {
-    Vibration.vibrate(duration: 20);
+      Vibration.vibrate(duration: 15);
     }
 
     // Cập nhật trạng thái của câu trả lời
@@ -64,8 +68,14 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
   }
 
   Future<void> onSaved() async {
-    await ref.read(questionProvider.notifier).questionSavedChange(widget.currentQuestion.id);
+    await ref
+        .read(questionProvider.notifier)
+        .questionSavedChange(widget.currentQuestion.id);
     _currentState.isSaved = !_currentState.isSaved;
+
+    if (await Vibration.hasVibrator() ?? false) {
+      Vibration.vibrate(duration: 15);
+    }
 
     // Cập nhật trạng thái của câu trả lời
     updateState(_currentState);
@@ -111,14 +121,26 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                             color: Colors.black,
                             fontSize: 12,
                           )),
+                      // TODO: fix không hiển thị trạng thái câu trả lời khi vào lại
+                      if (_currentState.answerState == AnswerState.correct) ...[
+                        const SizedBox(width: 4),
+                        const Icon(Icons.check, color: Colors.green),
+                      ],
+                      if (_currentState.answerState == AnswerState.wrong) ...[
+                        const SizedBox(width: 4),
+                        const Icon(Icons.close, color: Colors.red),
+                      ],
                     ],
                   ),
                 ),
                 IconButton(
                     onPressed: onSaved,
                     icon: Icon(
-                      _currentState.isSaved ? Icons.bookmark : Icons.bookmark_outline,
-                      color: _currentState.isSaved ? Colors.green : Colors.black,
+                      _currentState.isSaved
+                          ? Icons.bookmark
+                          : Icons.bookmark_outline,
+                      color:
+                          _currentState.isSaved ? Colors.green : Colors.black,
                     )),
               ],
             ),

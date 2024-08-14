@@ -1,4 +1,3 @@
-
 enum QuestionStatus {
   notAnswered,
   correct,
@@ -36,6 +35,21 @@ class Question {
   final QuestionStatus questionStatus; // 0: chưa trả lời, 1: đã trả lời đúng, 2: đã trả lời sai
 
   factory Question.fromMap(Map<String, dynamic> map) {
+    final QuestionStatus questionStatus;
+    switch (map['questionStatus']) {
+      case 0:
+        questionStatus = QuestionStatus.notAnswered;
+        break;
+      case 1:
+        questionStatus = QuestionStatus.correct;
+        break;
+      case 2:
+        questionStatus = QuestionStatus.wrong;
+        break;
+      default:
+        questionStatus = QuestionStatus.notAnswered;
+    }
+
     return Question(
       id: map['id'],
       question: map['question'],
@@ -53,11 +67,7 @@ class Question {
       isFailingPoint: map['isFailingPoint'] == 1,
       isHard: map['isHard'] == 1,
       isSaved: map['isSaved'] == 1,
-      questionStatus: map['questionStatus'] == 0
-          ? QuestionStatus.notAnswered
-          : map['questionStatus'] == 1
-              ? QuestionStatus.correct
-              : QuestionStatus.wrong,
+      questionStatus: questionStatus,
     );
   }
 

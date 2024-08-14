@@ -12,9 +12,11 @@ class SignsScreen extends ConsumerStatefulWidget {
   ConsumerState<SignsScreen> createState() => _SignsScreenState();
 }
 
-class _SignsScreenState extends ConsumerState<SignsScreen> with SingleTickerProviderStateMixin {
+class _SignsScreenState extends ConsumerState<SignsScreen>
+    with SingleTickerProviderStateMixin {
   late final List<Sign> allSigns;
-  late final List<List<Sign>> signsPerPage = List.filled(SignCategory.values.length, [], growable: true);
+  late final List<List<Sign>> signsPerPage =
+      List.filled(SignCategory.values.length, [], growable: true);
   late final TabController _tabController;
 
   @override
@@ -23,8 +25,10 @@ class _SignsScreenState extends ConsumerState<SignsScreen> with SingleTickerProv
     allSigns = ref.read(signProvider);
 
     for (final category in SignCategory.values) {
-      signsPerPage[category.index] = allSigns.where((sign) => sign.category == category).toList();
-      print('Có ${signsPerPage[category.index].length} biển báo thuộc loại $category');
+      signsPerPage[category.index] =
+          allSigns.where((sign) => sign.category == category).toList();
+      print(
+          'Có ${signsPerPage[category.index].length} biển báo thuộc loại $category');
     }
 
     // Xóa trang khác nếu không có biển báo
@@ -35,66 +39,69 @@ class _SignsScreenState extends ConsumerState<SignsScreen> with SingleTickerProv
     _tabController = TabController(length: signsPerPage.length, vsync: this);
   }
 
+  // Hiển thị thông tin chi tiết của biển báo khi người dùng chọn vào biển báo
   void onSignTap(Sign sign) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          insetPadding: const EdgeInsets.all(16),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 128),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(
                       maxHeight: 300,
                       maxWidth: 250,
-                    minHeight: 150,
-                    minWidth: 250,
+                      minHeight: 150,
+                      minWidth: 250,
+                    ),
+                    child: Image.asset(
+                      'assets/data/images_of_sign/${sign.id}.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  child: Image.asset(
-                    'assets/data/images_of_sign/${sign.id}.png',
-
-                    fit: BoxFit.contain,
+                  const SizedBox(height: 10),
+                  Text(
+                    sign.id,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  sign.id,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                  Text(
+                    sign.name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                Text(
-                  sign.name,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 10),
+                  Text(
+                    sign.description,
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  sign.description,
-                  style: const TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
           ),
         );
       },
     );
   }
-
 
   String _getSignCategoryName(SignCategory category) {
     switch (category) {
@@ -124,12 +131,14 @@ class _SignsScreenState extends ConsumerState<SignsScreen> with SingleTickerProv
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              title: const Text(
-                'Biển báo giao thông',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+              title: const Center(
+                child: Text(
+                  'Biển báo giao thông',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               pinned: true,
@@ -148,7 +157,8 @@ class _SignsScreenState extends ConsumerState<SignsScreen> with SingleTickerProv
                 controller: _tabController,
                 isScrollable: true,
                 tabs: signsPerPage.map((signs) {
-                  final String categoryName = _getSignCategoryName(signs.first.category);
+                  final String categoryName =
+                      _getSignCategoryName(signs.first.category);
                   return Tab(
                     child: Row(
                       children: [
@@ -167,6 +177,8 @@ class _SignsScreenState extends ConsumerState<SignsScreen> with SingleTickerProv
           controller: _tabController,
           children: signsPerPage.map((signs) {
             return ListView.builder(
+              // Lưu trạng thái scroll của mỗi tab
+              key: PageStorageKey<SignCategory>(signs.first.category),
               addRepaintBoundaries: false,
               itemCount: signs.length,
               itemBuilder: (context, index) {
