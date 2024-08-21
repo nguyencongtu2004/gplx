@@ -6,10 +6,12 @@ class SignItem extends StatelessWidget {
     super.key,
     required this.sign,
     required this.onTap,
+    required this.size,
   });
 
   final Sign sign;
   final void Function() onTap;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +24,8 @@ class SignItem extends StatelessWidget {
             // Hiển thị ảnh biển báo
             Image.asset(
               'assets/data/images_of_sign/${sign.id}.png',
-              width: 120,
-              height: 120,
+              width: size,
+              height: size,
               fit: BoxFit.scaleDown,
             ),
             const SizedBox(width: 10),

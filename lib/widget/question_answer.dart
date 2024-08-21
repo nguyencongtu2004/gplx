@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/model/question.dart';
+import 'package:gplx/model/sign.dart';
+import 'package:gplx/screen/signs_screen.dart';
 import 'package:gplx/widget/answer_item.dart';
 import 'package:gplx/widget/explanation_item.dart';
+import 'package:gplx/widget/sign_item.dart';
 import 'package:vibration/vibration.dart';
 
 import '../model/question_state.dart';
 import '../provider/question_provider.dart';
+import '../provider/sign_provider.dart';
 
 class QuestionAnswer extends ConsumerStatefulWidget {
   const QuestionAnswer({
@@ -30,19 +34,32 @@ class QuestionAnswer extends ConsumerStatefulWidget {
 
 class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
   late QuestionState _currentState;
+  final List<Sign> signs = [];
 
   @override
   void initState() {
     super.initState();
     _currentState = widget.questionState;
+
+    print(widget.currentQuestion.signId);
+    final signsFromProvider = ref.read(signProvider);
+
+    for (final String signId in widget.currentQuestion.signId) {
+      try {
+        final sign = signsFromProvider.firstWhere((element) => element.id == signId);
+        signs.add(sign);
+      } catch (e) {
+        print('Sign with id $signId not found');
+      }
+    }
   }
 
   void updateState(QuestionState newState) {
     setState(() {
       _currentState = newState;
     });
-    widget
-        .onStateChanged(newState); // Notify the parent widget or any listeners
+    // Thông báo cho widget cha biết trạng thái mới của widget
+    widget.onStateChanged(newState);
   }
 
   Future<void> onAnswer(int answeredIndex) async {
@@ -221,16 +238,14 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                 ),
               ),
               // Tra cứu biển báo
-              // TODO: fix không hiển thị biển báo khi vào lại
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Text(
-                  currentQuestion.signId.toString(),
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                  ),
-                ),
+              Column(
+                children: [
+                  for (final sign in signs)
+                    SignItem(
+                        sign: sign,
+                        size: 90,
+                        onTap: () => SignsScreen.onSignTap(context, sign)),
+                ],
               ),
             ]
           ],

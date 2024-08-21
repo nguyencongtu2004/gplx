@@ -8,39 +8,8 @@ import '../provider/sign_provider.dart';
 class SignsScreen extends ConsumerStatefulWidget {
   const SignsScreen({super.key});
 
-  @override
-  ConsumerState<SignsScreen> createState() => _SignsScreenState();
-}
-
-class _SignsScreenState extends ConsumerState<SignsScreen>
-    with SingleTickerProviderStateMixin {
-  late final List<Sign> allSigns;
-  late final List<List<Sign>> signsPerPage =
-      List.filled(SignCategory.values.length, [], growable: true);
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    allSigns = ref.read(signProvider);
-
-    for (final category in SignCategory.values) {
-      signsPerPage[category.index] =
-          allSigns.where((sign) => sign.category == category).toList();
-      print(
-          'Có ${signsPerPage[category.index].length} biển báo thuộc loại $category');
-    }
-
-    // Xóa trang khác nếu không có biển báo
-    if (signsPerPage[SignCategory.other.index].isEmpty) {
-      signsPerPage.removeAt(SignCategory.other.index);
-    }
-
-    _tabController = TabController(length: signsPerPage.length, vsync: this);
-  }
-
   // Hiển thị thông tin chi tiết của biển báo khi người dùng chọn vào biển báo
-  void onSignTap(Sign sign) {
+  static void onSignTap(BuildContext context, Sign sign) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -101,6 +70,37 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
         );
       },
     );
+  }
+
+  @override
+  ConsumerState<SignsScreen> createState() => _SignsScreenState();
+}
+
+class _SignsScreenState extends ConsumerState<SignsScreen>
+    with SingleTickerProviderStateMixin {
+  late final List<Sign> allSigns;
+  late final List<List<Sign>> signsPerPage =
+      List.filled(SignCategory.values.length, [], growable: true);
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    allSigns = ref.read(signProvider);
+
+    for (final category in SignCategory.values) {
+      signsPerPage[category.index] =
+          allSigns.where((sign) => sign.category == category).toList();
+      print(
+          'Có ${signsPerPage[category.index].length} biển báo thuộc loại $category');
+    }
+
+    // Xóa trang khác nếu không có biển báo
+    if (signsPerPage[SignCategory.other.index].isEmpty) {
+      signsPerPage.removeAt(SignCategory.other.index);
+    }
+
+    _tabController = TabController(length: signsPerPage.length, vsync: this);
   }
 
   String _getSignCategoryName(SignCategory category) {
@@ -185,9 +185,8 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
                 final sign = signs[index];
                 return SignItem(
                   sign: sign,
-                  onTap: () {
-                    onSignTap(sign);
-                  },
+                  size: 120,
+                  onTap: () => SignsScreen.onSignTap(context, sign),
                 );
               },
             );
