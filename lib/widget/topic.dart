@@ -117,7 +117,7 @@ class Topic extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '$wrongQuestion câu sai | $correctQuestion câu đúng',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                       ),
                       textAlign: TextAlign.end,

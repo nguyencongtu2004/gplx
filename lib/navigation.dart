@@ -7,6 +7,9 @@ import 'package:gplx/screen/profile_screen.dart';
 import 'package:gplx/screen/review_screen.dart';
 import 'package:gplx/screen/signs_screen.dart';
 import 'package:gplx/screen/splash_screen.dart';
+import 'package:gplx/screen/test_info_screen.dart';
+import 'package:gplx/screen/test_list_screen.dart';
+import 'package:gplx/screen/test_screen.dart';
 
 class RoutePage {
   const RoutePage(this.index, this.route, this.title, this.icon, this.selectedIcon, this.color);
@@ -38,7 +41,7 @@ final GoRouter router = GoRouter(
             routes: [
               GoRoute(
                 path: '/home',
-                builder: (context, state) => HomeScreen(),
+                builder: (context, state) => const HomeScreen(),
               ),
             ]
         ),
@@ -47,7 +50,7 @@ final GoRouter router = GoRouter(
             routes: [
               GoRoute(
                 path: '/review',
-                builder: (context, state) => ReviewScreen(),
+                builder: (context, state) => const ReviewScreen(),
               ),
             ]
         ),
@@ -99,10 +102,21 @@ final GoRouter router = GoRouter(
       return LearnScreen(chapter: chapter);
     }),
     GoRoute(path: '/chose-licence-class', builder: (context, state) {
-      return ChoseLicencesClassScreen();
+      return const ChoseLicencesClassScreen();
     }),
     GoRoute(path: '/signs', builder: (context, state) {
       return const SignsScreen();
+    }),
+    GoRoute(path: '/test-list', builder: (context, state) {
+      return const TestListScreen();
+    }),
+    GoRoute(path: '/test-info/:testNumber', builder: (context, state) {
+      final testNumber = int.parse(state.pathParameters['testNumber']!);
+      return TestInfoScreen(testNumber: testNumber);
+    }),
+    GoRoute(path: '/test/:testNumber', builder: (context, state) {
+      final testNumber = int.parse(state.pathParameters['testNumber']!);
+      return TestScreen(testNumber: testNumber);
     }),
   ],
 );

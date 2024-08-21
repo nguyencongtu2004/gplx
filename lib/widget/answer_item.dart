@@ -21,8 +21,8 @@ class AnswerItem extends StatelessWidget {
         color: answerState == AnswerState.none
             ? Colors.transparent
             : answerState == AnswerState.correct
-                ?  Color(0x5900DB57)
-                :  Color(0x8CFF1D1D),
+                ?  const Color(0x5900DB57)
+                :  const Color(0x8CFF1D1D),
         child: Row(
           children: [
             Icon(

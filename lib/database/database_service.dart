@@ -45,7 +45,7 @@ class DatabaseService {
         image TEXT,
         chapter INTEGER,
         isFailingPoint INTEGER,
-        otomotoExplanation TEXT,
+        newExplanation TEXT,
         isHard INTEGER,
         isSaved INTEGER,
         questionStatus INTEGER

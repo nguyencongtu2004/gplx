@@ -17,6 +17,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   var isShowTopic = false;
 
+  void onTestClick() {
+    print('Thi thử');
+    context.push('/test-list');
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -81,9 +86,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     imageUrl: 'assets/images/place-holder.png',
                     backgroundColor: const Color(0xFFC2FDCB),
                     titleColor: const Color(0xFF012504),
-                    onTap: () {
-                      print('Thi thử');
-                    }),
+                    onTap: onTestClick),
                 const SizedBox(height: 16),
                 const Text('Chọn phương pháp học',
                     style: TextStyle(
@@ -116,7 +119,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onTap: () async {
                       print('Truyền thống');
                       if (await Vibration.hasVibrator() ?? false) {
-                      Vibration.vibrate(duration: 20);
+                        Vibration.vibrate(duration: 20);
                       }
                       print('Tất cả câu hỏi');
                       context.push('/learn/-1');
@@ -147,58 +150,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ),
                         if (isShowTopic == false)
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (await Vibration.hasVibrator() ?? false) {
-                              Vibration.vibrate(duration: 20);
-                            }
-                            print('Học theo chủ đề');
-                            setState(() {
-                              isShowTopic = true;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: const Color(0xFF011D26),
-                            backgroundColor: const Color(0xFF73F6B7),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('Học theo chủ đề'),
-                              SizedBox(width: 4),
-                              Icon(Icons.arrow_forward),
-                            ],
-                          ),
-                        ),
-                        if (isShowTopic)
-                        ...[const SizedBox(height: 8),
-                        const Text(
-                          'Các chủ đề',
-                          style: TextStyle(
-                            color: Color(0xFF011D26),
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        for (int i = 0; i <= 7; i++)
-                          Topic(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            title: kTopic[i]!,
-                            imageUrl: 'assets/images/place-holder.png',
-                            progress: 0.5,
-                            correctQuestion: 10,
-                            wrongQuestion: 5,
-                            learnedQuestion: 15,
-                            totalQuestion: 60,
-                            backgroundColor: const Color(0xFF99F4C5),
-                            titleColor: const Color(0xFF121212),
-                            progressColor: const Color(0xFF0A6F4E),
-                            backgroundProgressColor: const Color(0xFF59D3AE),
-                            onTap: () {
-                              print(kTopic[i]);
-                              context.push('/learn/$i');
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (await Vibration.hasVibrator() ?? false) {
+                                Vibration.vibrate(duration: 20);
+                              }
+                              print('Học theo chủ đề');
+                              setState(() {
+                                isShowTopic = true;
+                              });
                             },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: const Color(0xFF011D26),
+                              backgroundColor: const Color(0xFF73F6B7),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Học theo chủ đề'),
+                                SizedBox(width: 4),
+                                Icon(Icons.arrow_forward),
+                              ],
+                            ),
                           ),
+                        if (isShowTopic) ...[
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Các chủ đề',
+                            style: TextStyle(
+                              color: Color(0xFF011D26),
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          for (int i = 0; i <= 7; i++)
+                            Topic(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              title: kTopic[i]!,
+                              imageUrl: 'assets/images/place-holder.png',
+                              progress: 0.5,
+                              correctQuestion: 10,
+                              wrongQuestion: 5,
+                              learnedQuestion: 15,
+                              totalQuestion: 60,
+                              backgroundColor: const Color(0xFF99F4C5),
+                              titleColor: const Color(0xFF121212),
+                              progressColor: const Color(0xFF0A6F4E),
+                              backgroundProgressColor: const Color(0xFF59D3AE),
+                              onTap: () {
+                                print(kTopic[i]);
+                                context.push('/learn/$i');
+                              },
+                            ),
                           const SizedBox(height: 8),
                           Center(
                             child: ElevatedButton(

@@ -41,16 +41,17 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
     setState(() {
       _currentState = newState;
     });
-    widget.onStateChanged(newState); // Notify the parent widget or any listeners
+    widget
+        .onStateChanged(newState); // Notify the parent widget or any listeners
   }
-
 
   Future<void> onAnswer(int answeredIndex) async {
     if (_currentState.answerState != AnswerState.none) {
       return;
     }
     final isCorrect = answeredIndex == widget.currentQuestion.correctAnswer - 1;
-    _currentState.answerState = isCorrect ? AnswerState.correct : AnswerState.wrong;
+    _currentState.answerState =
+        isCorrect ? AnswerState.correct : AnswerState.wrong;
     _currentState.wrongAnswer = isCorrect ? -1 : answeredIndex;
 
     await ref.read(questionProvider.notifier).questionStatusChange(
@@ -206,6 +207,32 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                 correctAnswer: currentQuestion.correctAnswer,
               ),
             ),
+            if (currentQuestion.signId.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  'Tra cứu biển báo',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // Tra cứu biển báo
+              // TODO: fix không hiển thị biển báo khi vào lại
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: Text(
+                  currentQuestion.signId.toString(),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ]
           ],
           const SizedBox(height: 48),
         ],

@@ -50,6 +50,14 @@ class Question {
         questionStatus = QuestionStatus.notAnswered;
     }
 
+    final stringSignId = (map['signId'] as String);
+    final List<String> signId;
+    if (stringSignId.isNotEmpty) {
+      signId = stringSignId.split(';');
+    } else {
+      signId = [];
+    }
+
     return Question(
       id: map['id'],
       question: map['question'],
@@ -60,8 +68,8 @@ class Question {
         map['answer4'],
       ].where((element) => element.isNotEmpty).toList(),
       correctAnswer: map['correctAnswer'],
-      explanation: map['explanation'],
-      signId:( map['signId'] as String).split(','),
+      explanation: map['newExplanation'], // this
+      signId: signId,
       image: map['image'],
       chapter: map['chapter'],
       isFailingPoint: map['isFailingPoint'] == 1,
