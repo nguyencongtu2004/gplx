@@ -11,6 +11,15 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
       BuildContext context, WidgetRef ref, LicenseClassItem item) {
     print('Chọn hạng thi ${item.title}');
     ref.read(licenseClassProvider.notifier).changeLicenseClass(item.title);
+
+    // toast thông báo
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Đã chọn hạng ${item.title}'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
 
   void showLicenseClassDetail(

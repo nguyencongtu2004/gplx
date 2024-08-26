@@ -224,7 +224,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 onTap: onChangeLicense,
                 leading: const Icon(Icons.star),
                 title: Text(
-                  ref.watch(licenseClassProvider),
+                  'Hạng ${ref.watch(licenseClassProvider)}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 trailing: const Row(
