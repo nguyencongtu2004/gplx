@@ -17,6 +17,7 @@ class Topic extends StatelessWidget {
     this.titleColor = Colors.black,
     this.backgroundProgressColor = Colors.grey,
     this.progressColor = Colors.white,
+    required this.isVibration,
   });
 
   final String title;
@@ -32,6 +33,7 @@ class Topic extends StatelessWidget {
   final Color titleColor;
   final Color backgroundProgressColor;
   final Color progressColor;
+  final bool isVibration;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +41,7 @@ class Topic extends StatelessWidget {
       padding: padding,
       child: GestureDetector(
         onTap: () async {
-          if (await Vibration.hasVibrator() ?? false) {
+          if (isVibration && (await Vibration.hasVibrator() ?? false)) {
             Vibration.vibrate(duration: 20);
           }
           onTap();

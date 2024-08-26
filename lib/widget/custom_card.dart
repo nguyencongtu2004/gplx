@@ -14,7 +14,7 @@ class CustomCard extends StatelessWidget {
     this.descriptionColor = Colors.black,
     required this.onTap,
     this.padding = const EdgeInsets.all(0),
-    this.vibration = true,
+    required this.isVibration,
     this.child,
   });
 
@@ -29,7 +29,7 @@ class CustomCard extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final void Function() onTap;
   final Widget? child;
-  final bool vibration;
+  final bool isVibration;
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +114,7 @@ class CustomCard extends StatelessWidget {
       padding: padding,
       child: GestureDetector(
         onTap: () async {
-          if (vibration && (await Vibration.hasVibrator() ?? false)) {
+          if (isVibration && (await Vibration.hasVibrator() ?? false)) {
             Vibration.vibrate(duration: 20);
           }
           onTap();

@@ -39,6 +39,11 @@ class QuestionProvider extends StateNotifier<List<Question>> {
     await QuestionsTable.updateQuestionStatus(questionId, status);
   }
 
+  Future<void> resetQuestionsState() async {
+    state = state.map((question) => question.copyWith(isSaved: false, questionStatus: QuestionStatus.notAnswered)).toList();
+    await QuestionsTable.resetQuestions();
+  }
+
 }
 
 final questionProvider =

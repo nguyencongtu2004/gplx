@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/widget/sign_item.dart';
+import 'package:vibration/vibration.dart';
+
 
 import '../model/sign.dart';
+import '../provider/settings_provider.dart';
 import '../provider/sign_provider.dart';
 
 class SignsScreen extends ConsumerStatefulWidget {
   const SignsScreen({super.key});
 
   // Hiển thị thông tin chi tiết của biển báo khi người dùng chọn vào biển báo
-  static void onSignTap(BuildContext context, Sign sign) {
+  static Future<void> onSignTap(BuildContext context, Sign sign, {required bool isVibration}) async {
+    if (isVibration && (await Vibration.hasVibrator() ?? false)) {
+      Vibration.vibrate(duration: 15);
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -147,6 +154,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isVibration = ref.watch(settingsProvider.select((value) => value.isVibration));
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -214,7 +222,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
                 return SignItem(
                   sign: sign,
                   size: 120,
-                  onTap: () => SignsScreen.onSignTap(context, sign),
+                  onTap: () => SignsScreen.onSignTap(context, sign, isVibration: isVibration),
                 );
               },
             );

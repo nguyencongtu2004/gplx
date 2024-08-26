@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gplx/provider/license_class_provider.dart';
 
 import '../provider/question_provider.dart';
+import '../provider/settings_provider.dart';
 import '../provider/sign_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -41,6 +43,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       print('Dữ liệu biển báo đã được tải');
     } catch (e) {
       print('Lỗi load biển báo: $e');
+      // Có thể hiển thị một thông báo lỗi hoặc thử tải lại dữ liệu
+    }
+
+    try {
+      // Tải dữ liệu cài đặt và hạng giấy phép lái xe
+      await ref.read(settingsProvider.notifier).loadSettings();
+      await ref.read(licenseClassProvider.notifier).loadLicenseClass();
+      print('Dữ liệu cài đặt đã được tải');
+    } catch (e) {
+      print('Lỗi load cài đặt: $e');
       // Có thể hiển thị một thông báo lỗi hoặc thử tải lại dữ liệu
     }
 

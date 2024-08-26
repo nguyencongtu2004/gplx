@@ -5,6 +5,7 @@ import 'package:gplx/widget/custom_card.dart';
 import 'package:gplx/widget/topic.dart';
 import 'package:vibration/vibration.dart';
 
+import '../provider/settings_provider.dart';
 import '../provider/topic_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isVibration = ref.watch(settingsProvider).isVibration;
     final double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         body: SingleChildScrollView(
@@ -86,6 +88,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     imageUrl: 'assets/images/place-holder.png',
                     backgroundColor: const Color(0xFFC2FDCB),
                     titleColor: const Color(0xFF012504),
+                    isVibration: isVibration,
                     onTap: onTestClick),
                 const SizedBox(height: 16),
                 const Text('Chọn phương pháp học',
@@ -103,6 +106,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     imageUrl: 'assets/images/place-holder.png',
                     backgroundColor: const Color(0xFFBEFFFF),
                     titleColor: const Color(0xFF010925),
+                    isVibration: isVibration,
                     onTap: () {
                       print('Lặp lại cách quãng');
                     }),
@@ -115,12 +119,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     imageUrl: 'assets/images/place-holder.png',
                     backgroundColor: const Color(0xFFBEFFE7),
                     titleColor: const Color(0xFF011D26),
-                    vibration: true,
+                    isVibration: isVibration,
                     onTap: () async {
-                      print('Truyền thống');
-                      if (await Vibration.hasVibrator() ?? false) {
-                        Vibration.vibrate(duration: 20);
-                      }
                       print('Tất cả câu hỏi');
                       context.push('/learn/-1');
                     },
@@ -130,7 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () async {
-                            if (await Vibration.hasVibrator() ?? false) {
+                            if (isVibration && (await Vibration.hasVibrator() ?? false)) {
                               Vibration.vibrate(duration: 20);
                             }
                             print('Tất cả câu hỏi');
@@ -152,7 +152,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         if (isShowTopic == false)
                           ElevatedButton(
                             onPressed: () async {
-                              if (await Vibration.hasVibrator() ?? false) {
+                              if (isVibration && (await Vibration.hasVibrator() ?? false)) {
                                 Vibration.vibrate(duration: 20);
                               }
                               print('Học theo chủ đề');
@@ -197,6 +197,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               titleColor: const Color(0xFF121212),
                               progressColor: const Color(0xFF0A6F4E),
                               backgroundProgressColor: const Color(0xFF59D3AE),
+                              isVibration: isVibration,
                               onTap: () {
                                 print(kTopic[i]);
                                 context.push('/learn/$i');
@@ -206,7 +207,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Center(
                             child: ElevatedButton(
                               onPressed: () async {
-                                if (await Vibration.hasVibrator() ?? false) {
+                                if (isVibration && (await Vibration.hasVibrator() ?? false)) {
                                   Vibration.vibrate(duration: 20);
                                 }
                                 print('Ẩn chủ đề');

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../provider/settings_provider.dart';
 import '../widget/custom_card.dart';
 
 class ReviewScreen extends ConsumerStatefulWidget {
@@ -36,6 +37,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isVibration = ref.watch(settingsProvider).isVibration;
     final double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         body: SingleChildScrollView(
@@ -101,6 +103,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                         backgroundColor: const Color(0xFFD5F2D0),
                         titleColor: const Color(0xFF1A6F50),
                         descriptionColor: const Color(0xFF73A37E),
+                        isVibration: isVibration,
                         onTap: () {
                           print('Câu hỏi đã lưu');
                         }),
@@ -122,6 +125,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                         backgroundColor: const Color(0xFAE0FFFA),
                         titleColor: const Color(0xFF00697F),
                         descriptionColor: const Color(0xFF51A7BF),
+                        isVibration: isVibration,
                         onTap: onSavedQuestionClick),
                     const SizedBox(height: 16),
                     Row(
@@ -134,6 +138,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                               imageUrl: 'assets/images/place-holder.png',
                               backgroundColor: const Color(0xFFFFE8CA),
                               titleColor: const Color(0xFFD15C28),
+                              isVibration: isVibration,
                               onTap: onWrongQuestionClick),
                         ),
                         const SizedBox(width: 16),
@@ -145,6 +150,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                               imageUrl: 'assets/images/place-holder.png',
                               backgroundColor: const Color(0xFFFFCECE),
                               titleColor: const Color(0xFFA71F2A),
+                              isVibration: isVibration,
                               onTap: onHardQuestionClick),
                         ),
                       ],
@@ -166,6 +172,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                         backgroundColor: const Color(0xFFBDFFE7),
                         titleColor: const Color(0xFF012504),
                         descriptionColor: Colors.black,
+                        isVibration: isVibration,
                         onTap: onSignsClick),
                     const SizedBox(height: 16),
                   ],

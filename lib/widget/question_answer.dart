@@ -10,6 +10,7 @@ import 'package:vibration/vibration.dart';
 
 import '../model/question_state.dart';
 import '../provider/question_provider.dart';
+import '../provider/settings_provider.dart';
 import '../provider/sign_provider.dart';
 
 class QuestionAnswer extends ConsumerStatefulWidget {
@@ -34,6 +35,7 @@ class QuestionAnswer extends ConsumerStatefulWidget {
 
 class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
   late QuestionState _currentState;
+  late bool isVibration;
   final List<Sign> signs = [];
 
   @override
@@ -52,6 +54,8 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
         print('Sign with id $signId not found');
       }
     }
+
+    isVibration = ref.read(settingsProvider).isVibration;
   }
 
   void updateState(QuestionState newState) {
@@ -77,7 +81,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
             ? QuestionStatus.correct
             : QuestionStatus.wrong);
 
-    if (await Vibration.hasVibrator() ?? false) {
+    if (isVibration && (await Vibration.hasVibrator() ?? false)) {
       Vibration.vibrate(duration: 15);
     }
 
@@ -91,7 +95,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
         .questionSavedChange(widget.currentQuestion.id);
     _currentState.isSaved = !_currentState.isSaved;
 
-    if (await Vibration.hasVibrator() ?? false) {
+    if (isVibration && (await Vibration.hasVibrator() ?? false)) {
       Vibration.vibrate(duration: 15);
     }
 
@@ -244,7 +248,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                     SignItem(
                         sign: sign,
                         size: 90,
-                        onTap: () => SignsScreen.onSignTap(context, sign)),
+                        onTap: () => SignsScreen.onSignTap(context, sign, isVibration: isVibration)),
                 ],
               ),
             ]

@@ -49,4 +49,14 @@ class QuestionsTable {
     print('Updated question $questionId status to $status');
   }
 
+  // Hàm reset trạng thái của tất cả câu hỏi
+  static Future<void> resetQuestions() async {
+    final db = await DatabaseService().database;
+    await db!.update(
+      'questions',
+      {'isSaved': 0, 'questionStatus': 0},
+    );
+    print('Reset all questions');
+  }
+
 }

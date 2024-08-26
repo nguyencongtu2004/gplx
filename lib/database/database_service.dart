@@ -60,10 +60,19 @@ class DatabaseService {
         category INTEGER
       )
     ''');
+    await db.execute('''
+      CREATE TABLE settings (
+        id INTEGER PRIMARY KEY,
+        isDarkMode INTEGER,
+        isVibration INTEGER,
+        licenseClass TEXT
+      )
+    ''');
 
     // Nhập dữ liệu từ CSV
     await _importCSVtoTable(db, 'assets/data/questions.csv', 'questions');
     await _importCSVtoTable(db, 'assets/data/signs.csv', 'signs');
+    await db.insert('settings', {'id': 1, 'isDarkMode': 0, 'isVibration': 1, 'licenseClass': 'B2'});
   }
 
   Future<void> _importCSVtoTable(Database db, String csvPath, String tableName) async {

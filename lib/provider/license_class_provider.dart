@@ -1,13 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gplx/database/settings_table.dart';
 
 import '../model/license_class_item.dart';
 
 class LicenseClassProvider extends StateNotifier<String> {
   LicenseClassProvider() : super('B2');
 
-  void changeLicenseClass(String licenseClass) {
+  Future<void> loadLicenseClass() async {
+    final licenseClass = await SettingsTable.getLicenseClass();
     state = licenseClass;
-    // TODO: Lưu hạng thi vào cơ sở dữ liệu
+  }
+
+  Future<void> changeLicenseClass(String licenseClass) async {
+    state = licenseClass;
+    await SettingsTable.updateLicenseClass(licenseClass);
   }
 }
 
