@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-enum AnswerState { none, correct, wrong }
+enum AnswerState { none, answered, correct, wrong }
 class AnswerItem extends StatelessWidget {
   const AnswerItem({
     super.key,

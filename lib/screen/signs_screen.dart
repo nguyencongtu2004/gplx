@@ -124,6 +124,27 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
     }
   }
 
+  String _getSignCategoryImage(SignCategory category) {
+    switch (category) {
+      case SignCategory.prohibitory:
+        return 'P.102';
+      case SignCategory.warning:
+        return 'W.233';
+      case SignCategory.mandatory:
+        return 'R.303';
+      case SignCategory.indication:
+        return 'I.408';
+      case SignCategory.indicationOnHighway:
+        return 'IE.474';
+      case SignCategory.additional:
+        return 'S.502';
+      case SignCategory.roadMarking:
+        return 'V.1.1';
+      default:
+        return 'Khác';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,7 +168,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
               actions: [
                 IconButton(
                   onPressed: () {
-                    // todo
+                    // todo: thêm lọc biển báo
                   },
                   icon: const Icon(Icons.more_vert),
                 )
@@ -159,10 +180,17 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
                 tabs: signsPerPage.map((signs) {
                   final String categoryName =
                       _getSignCategoryName(signs.first.category);
+                  final String categoryImage =
+                      _getSignCategoryImage(signs.first.category);
                   return Tab(
                     child: Row(
                       children: [
-                        const Icon(Icons.image, size: 42),
+                        Image.asset(
+                          'assets/data/images_of_sign/$categoryImage.png',
+                          width: 30,
+                          height: 30,
+                          fit: BoxFit.scaleDown,
+                        ),
                         const SizedBox(width: 8),
                         Text(categoryName),
                       ],
