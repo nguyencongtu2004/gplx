@@ -1,7 +1,7 @@
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import 'package:csv/csv.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DatabaseService {
   Database? _database;
@@ -72,16 +72,20 @@ class DatabaseService {
     // Nhập dữ liệu từ CSV
     await _importCSVtoTable(db, 'assets/data/questions.csv', 'questions');
     await _importCSVtoTable(db, 'assets/data/signs.csv', 'signs');
-    await db.insert('settings', {'id': 1, 'isDarkMode': 0, 'isVibration': 1, 'licenseClass': 'B2'});
+    await db.insert('settings',
+        {'id': 1, 'isDarkMode': 0, 'isVibration': 1, 'licenseClass': 'B2'});
   }
 
-  Future<void> _importCSVtoTable(Database db, String csvPath, String tableName) async {
+  Future<void> _importCSVtoTable(
+      Database db, String csvPath, String tableName) async {
     // Đọc file CSV
     final csvString = await rootBundle.loadString(csvPath);
-    final List<List<dynamic>> csvData = const CsvToListConverter().convert(csvString);
+    final List<List<dynamic>> csvData =
+        const CsvToListConverter().convert(csvString);
 
     // Xác định tên cột cho bảng
-    List<String> columns = csvData[0].map((column) => column.toString()).toList();
+    List<String> columns =
+        csvData[0].map((column) => column.toString()).toList();
 
     // Lặp qua các hàng trong file CSV và chèn vào bảng
     for (int i = 1; i < csvData.length; i++) {
@@ -89,9 +93,9 @@ class DatabaseService {
       for (int j = 0; j < columns.length; j++) {
         row[columns[j]] = csvData[i][j];
       }
-      await db.insert(tableName, row, conflictAlgorithm: ConflictAlgorithm.replace);
+      await db.insert(tableName, row,
+          conflictAlgorithm: ConflictAlgorithm.replace);
     }
     print('Imported $tableName');
   }
 }
-

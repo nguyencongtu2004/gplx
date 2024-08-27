@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gplx/provider/question_provider.dart';
 import 'package:gplx/widget/sign_item.dart';
 import 'package:vibration/vibration.dart';
-
 
 import '../model/sign.dart';
 import '../provider/settings_provider.dart';
@@ -12,7 +12,8 @@ class SignsScreen extends ConsumerStatefulWidget {
   const SignsScreen({super.key});
 
   // Hiển thị thông tin chi tiết của biển báo khi người dùng chọn vào biển báo
-  static Future<void> onSignTap(BuildContext context, Sign sign, {required bool isVibration}) async {
+  static Future<void> onSignTap(BuildContext context, Sign sign,
+      {required bool isVibration}) async {
     if (isVibration && (await Vibration.hasVibrator() ?? false)) {
       Vibration.vibrate(duration: 15);
     }
@@ -86,21 +87,37 @@ class SignsScreen extends ConsumerStatefulWidget {
 class _SignsScreenState extends ConsumerState<SignsScreen>
     with SingleTickerProviderStateMixin {
   late final List<Sign> allSigns;
+  late final List<Sign> usedSigns;
+
   late final List<List<Sign>> signsPerPage =
       List.filled(SignCategory.values.length, [], growable: true);
   late final TabController _tabController;
+  var isShowUsedSigns = false;
+
+  void updateFilteredSigns(List<Sign> signs) {
+    for (final category in SignCategory.values) {
+      if (category == SignCategory.other) {
+        continue;
+      }
+      signsPerPage[category.index] =
+          signs.where((sign) => sign.category == category).toList();
+      print(
+          'Có ${signsPerPage[category.index].length} biển báo thuộc loại $category');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     allSigns = ref.read(signProvider);
+    usedSigns = ref.read(questionProvider).fold<List<Sign>>(
+        [],
+            (previousValue, element) => previousValue
+          ..addAll(element.signId
+              .map((signId) => allSigns.firstWhere((sign) => sign.id == signId))
+              .toList())).toSet().toList(); // Lọc ra các biển báo không trùng lặp và chuyển về List
 
-    for (final category in SignCategory.values) {
-      signsPerPage[category.index] =
-          allSigns.where((sign) => sign.category == category).toList();
-      print(
-          'Có ${signsPerPage[category.index].length} biển báo thuộc loại $category');
-    }
+    updateFilteredSigns(allSigns);
 
     // Xóa trang khác nếu không có biển báo
     if (signsPerPage[SignCategory.other.index].isEmpty) {
@@ -108,6 +125,31 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
     }
 
     _tabController = TabController(length: signsPerPage.length, vsync: this);
+  }
+
+  void onMoreButtonPressed() {
+    showMenu(
+        context: context,
+        position: const RelativeRect.fromLTRB(double.infinity, 80, 0, 0),
+        items: [
+          PopupMenuItem(
+            child: CheckboxListTile(
+              value: isShowUsedSigns,
+              onChanged: (_) {
+                setState(() {
+                  isShowUsedSigns = !isShowUsedSigns;
+                  if (isShowUsedSigns) {
+                    updateFilteredSigns(usedSigns);
+                  } else {
+                    updateFilteredSigns(allSigns);
+                  }
+                });
+                Navigator.of(context).pop();
+              },
+              title: const Text('Hiển thị biển báo trong câu hỏi'),
+            ),
+          ),
+        ]);
   }
 
   String _getSignCategoryName(SignCategory category) {
@@ -154,7 +196,8 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isVibration = ref.watch(settingsProvider.select((value) => value.isVibration));
+    final isVibration =
+        ref.watch(settingsProvider.select((value) => value.isVibration));
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -175,9 +218,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
               snap: true,
               actions: [
                 IconButton(
-                  onPressed: () {
-                    // todo: thêm lọc biển báo
-                  },
+                  onPressed: onMoreButtonPressed,
                   icon: const Icon(Icons.more_vert),
                 )
               ],
@@ -222,7 +263,8 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
                 return SignItem(
                   sign: sign,
                   size: 120,
-                  onTap: () => SignsScreen.onSignTap(context, sign, isVibration: isVibration),
+                  onTap: () => SignsScreen.onSignTap(context, sign,
+                      isVibration: isVibration),
                 );
               },
             );
