@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/database/questions_table.dart';
 import 'package:gplx/model/question.dart';
 
+import '../model/question_state.dart';
+
 class QuestionProvider extends StateNotifier<List<Question>> {
   QuestionProvider() : super([]);
 

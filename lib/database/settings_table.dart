@@ -2,7 +2,6 @@ import '../model/settings.dart';
 import 'database_service.dart';
 
 class SettingsTable {
-
   static Future<Settings> getSettings() async {
     final db = await DatabaseService().database;
     final data = await db!.query('settings');
@@ -40,4 +39,6 @@ class SettingsTable {
     final db = await DatabaseService().database;
     await db!.update('settings', {'licenseClass': licenseClass});
   }
+
+  // todo: lưu 'chỉ hiển thị biển báo trong câu hỏi' vào settings
 }

@@ -146,7 +146,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
                 });
                 Navigator.of(context).pop();
               },
-              title: const Text('Hiển thị biển báo trong câu hỏi'),
+              title: const Text('Chỉ hiển thị biển báo trong câu hỏi'),
             ),
           ),
         ]);
