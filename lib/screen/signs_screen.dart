@@ -196,6 +196,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
 
   @override
   Widget build(BuildContext context) {
+
     final isVibration =
         ref.watch(settingsProvider.select((value) => value.isVibration));
     return Scaffold(
@@ -253,20 +254,18 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
         body: TabBarView(
           controller: _tabController,
           children: signsPerPage.map((signs) {
-            return ListView.builder(
-              // Lưu trạng thái scroll của mỗi tab
+            // không dùng ListView để nó load trước hình ảnh
+            return SingleChildScrollView(
               key: PageStorageKey<SignCategory>(signs.first.category),
-              addRepaintBoundaries: false,
-              itemCount: signs.length,
-              itemBuilder: (context, index) {
-                final sign = signs[index];
-                return SignItem(
-                  sign: sign,
-                  size: 120,
-                  onTap: () => SignsScreen.onSignTap(context, sign,
-                      isVibration: isVibration),
-                );
-              },
+              child: Column(
+                children: signs.map((sign) {
+                  return SignItem(
+                    sign: sign,
+                    size: 120,
+                    onTap: () => SignsScreen.onSignTap(context, sign, isVibration: isVibration),
+                  );
+                }).toList(),
+              ),
             );
           }).toList(),
         ),
