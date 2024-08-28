@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/model/question.dart';
 import 'package:gplx/provider/topic_provider.dart';
@@ -103,7 +104,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
     }
     questionStates = List.generate(
         allQuestions.length,
-            (index) => QuestionState(
+        (index) => QuestionState(
             isSaved: allQuestions[index].isSaved,
             answerState: AnswerState.none));
     totalQuestion = allQuestions.length;
@@ -143,9 +144,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
           controller: _scrollController,
           children: [
             for (int i = 0; i < totalQuestion; i++)
-            SizedBox(
-              height: 80,
-              child: Column(
+              Column(
                 children: [
                   QuestionItem(
                     key: ValueKey(allQuestions[i].id),
@@ -164,7 +163,6 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                     ),
                 ],
               ),
-            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -181,12 +179,13 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
     // sau khi khung hình hiện tại (frame) của widget tree đã được
     // render xong và các thay đổi đã được áp dụng.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final double position = currentQuestionIndex * 80 - 80 * 2;
-      _scrollController.jumpTo(position);
+      final double position = currentQuestionIndex * 80 - 80 * 2; // 80 là chiều cao của mỗi item
+      if (currentQuestionIndex > 2) {
+        _scrollController.jumpTo(position);
+      }
       _animationController.forward();
     });
   }
-
 
   void hideCustomTopSheet() {
     _animationController.reverse().then((_) {
@@ -202,12 +201,13 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
       appBar: AppBar(
         title: GestureDetector(
           onPanEnd: (details) {
+            if (totalQuestion == 0 || isShowCustomTopSheet) return;
             if (details.velocity.pixelsPerSecond.dy > 50) {
               showCustomTopSheet(context);
             }
           },
           onTap: () {
-            if (totalQuestion == 0) return;
+            if (totalQuestion == 0 || isShowCustomTopSheet) return;
             showCustomTopSheet(context);
           },
           child: Center(
@@ -222,130 +222,146 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              if (totalQuestion == 0) return;
-              if (isShowCustomTopSheet) {
-                hideCustomTopSheet();
-              } else {
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 200),
+            crossFadeState: isShowCustomTopSheet
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: IconButton(
+              style: totalQuestion == 0 ? ButtonStyle(
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
+              ) : null,
+              onPressed: () {
+                if (totalQuestion == 0) return;
                 showCustomTopSheet(context);
-              }
-            },
-            icon: Icon(Icons.list,
-                color: totalQuestion == 0 ? Colors.transparent : Colors.black),
+              },
+              icon: Icon(Icons.list,
+                  color:
+                      totalQuestion == 0 ? Colors.transparent : Colors.black),
+            ),
+            secondChild: IconButton(
+              onPressed: () {
+                hideCustomTopSheet();
+              },
+              icon: const Icon(Icons.close, color: Colors.black),
+            ),
           ),
         ],
       ),
       body: totalQuestion == 0
-          ? const Center(
-        child: Text(
-          'Không có câu hỏi nào',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-          ),
-        ),
-      )
-          : Stack(
-        children: [
-          PageView.builder(
-            controller: _pageController,
-            itemCount: totalQuestion,
-            itemBuilder: (context, index) {
-              return QuestionAnswer(
-                key: ValueKey(allQuestions[index].id),
-                currentQuestion: allQuestions[index],
-                currentQuestionIndex: index + 1,
-                totalQuestion: totalQuestion,
-                questionState: questionStates[index],
-                onStateChanged: (newState) {
-                  setState(() {
-                    questionStates[index] = newState;
-                  });
-                },
-              );
-            },
-            onPageChanged: (index) {
-              setState(() {
-                currentQuestionIndex = index;
-                isShowPreviousButton = index != 0;
-                isShowNextButton = index != totalQuestion - 1;
-              });
-            },
-          ),
-          // Bottom navigation
-          if (totalQuestion != 0)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                color: const Color(0xFFBDFFE7),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                height: 50,
-                child: Row(
-                  children: [
-                    if (isShowPreviousButton)
-                      Expanded(
-                        child: MaterialButton(
-                          padding: const EdgeInsets.all(0),
-                          onPressed: onPreviousClick,
-                          splashColor: Colors.transparent,
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(Icons.arrow_back_ios),
-                              Text(
-                                'Câu trước',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    if (isShowNextButton)
-                      Expanded(
-                        child: MaterialButton(
-                          padding: const EdgeInsets.all(0),
-                          onPressed: onNextClick,
-                          splashColor: Colors.transparent,
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                'Câu sau ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Icon(Icons.arrow_forward_ios)
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
+          ? Center(
+              child: const Text(
+                'Không có câu hỏi nào',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
                 ),
-              ),
-            ),
-          if (isShowCustomTopSheet)
-            FadeTransition(
-              opacity: _fadeAnimation,
-              child: ModalBarrier(
-                color: Colors.black54,
-                dismissible: true,
-                onDismiss: hideCustomTopSheet,
-              ),
-            ),
+              )
+                  .animate()
+                  .fadeIn(duration: 500.ms, curve: Curves.easeInOut)
+                  .slideY(),
+            )
+          : Stack(
+              children: [
+                PageView.builder(
+                  controller: _pageController,
+                  itemCount: totalQuestion,
+                  itemBuilder: (context, index) {
+                    return QuestionAnswer(
+                      key: ValueKey(allQuestions[index].id),
+                      currentQuestion: allQuestions[index],
+                      currentQuestionIndex: index + 1,
+                      totalQuestion: totalQuestion,
+                      questionState: questionStates[index],
+                      onStateChanged: (newState) {
+                        setState(() {
+                          questionStates[index] = newState;
+                          // todo: update question state
+                        });
+                      },
+                    );
+                  },
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentQuestionIndex = index;
+                      isShowPreviousButton = index != 0;
+                      isShowNextButton = index != totalQuestion - 1;
+                    });
+                  },
+                ),
+                // Bottom navigation
+                if (totalQuestion != 0)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: const Color(0xFFBDFFE7),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      height: 50,
+                      child: Row(
+                        children: [
+                          if (isShowPreviousButton)
+                            Expanded(
+                              child: MaterialButton(
+                                padding: const EdgeInsets.all(0),
+                                onPressed: onPreviousClick,
+                                splashColor: Colors.transparent,
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.arrow_back_ios),
+                                    Text(
+                                      'Câu trước',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          if (isShowNextButton)
+                            Expanded(
+                              child: MaterialButton(
+                                padding: const EdgeInsets.all(0),
+                                onPressed: onNextClick,
+                                splashColor: Colors.transparent,
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Câu sau ',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Icon(Icons.arrow_forward_ios)
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (isShowCustomTopSheet)
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: ModalBarrier(
+                      color: Colors.black54,
+                      dismissible: true,
+                      onDismiss: hideCustomTopSheet,
+                    ),
+                  ),
 
-          if (isShowCustomTopSheet) buildCustomTopSheet(),
-        ],
-      ),
+                if (isShowCustomTopSheet) buildCustomTopSheet(),
+              ],
+            ),
     );
   }
 

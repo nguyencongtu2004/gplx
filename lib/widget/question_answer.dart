@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/model/question.dart';
 import 'package:gplx/model/sign.dart';
@@ -48,10 +49,12 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
 
     for (final String signId in widget.currentQuestion.signId) {
       try {
-        final sign = signsFromProvider.firstWhere((element) => element.id == signId);
+        final sign =
+            signsFromProvider.firstWhere((element) => element.id == signId);
         signs.add(sign);
       } catch (e) {
         print('Sign with id $signId not found');
+        Vibration.vibrate(duration: 1000);
       }
     }
 
@@ -143,12 +146,12 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                             color: Colors.black,
                             fontSize: 12,
                           )),
-                      // TODO: fix không hiển thị trạng thái câu trả lời khi vào lại
-                      if (_currentState.answerState == AnswerState.correct) ...[
+                      if (currentQuestion.questionStatus ==
+                          QuestionStatus.correct) ...[
                         const SizedBox(width: 4),
                         const Icon(Icons.check, color: Colors.green),
-                      ],
-                      if (_currentState.answerState == AnswerState.wrong) ...[
+                      ] else if (currentQuestion.questionStatus ==
+                          QuestionStatus.wrong) ...[
                         const SizedBox(width: 4),
                         const Icon(Icons.close, color: Colors.red),
                       ],
@@ -206,53 +209,58 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
             }).toList(),
           ),
           // Giải thích
-          if (_currentState.answerState != AnswerState.none) ...[
-            const SizedBox(height: 16),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                'Kết quả',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            // Giải thích
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child: ExplanationItem(
-                answerState: _currentState.answerState,
-                explanation: currentQuestion.explanation,
-                correctAnswer: currentQuestion.correctAnswer,
-              ),
-            ),
-            if (currentQuestion.signId.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  'Tra cứu biển báo',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              // Tra cứu biển báo
-              Column(
+          if (_currentState.answerState != AnswerState.none)
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final sign in signs)
-                    SignItem(
-                        sign: sign,
-                        size: 90,
-                        onTap: () => SignsScreen.onSignTap(context, sign, isVibration: isVibration)),
-                ],
-              ),
-            ]
-          ],
+                  const SizedBox(height: 16),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      'Kết quả',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // Giải thích
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    child: ExplanationItem(
+                      answerState: _currentState.answerState,
+                      explanation: currentQuestion.explanation,
+                      correctAnswer: currentQuestion.correctAnswer,
+                    ),
+                  ),
+                  if (currentQuestion.signId.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        'Tra cứu biển báo',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    // Tra cứu biển báo
+                    Column(
+                      children: [
+                        for (final sign in signs)
+                          SignItem(
+                              sign: sign,
+                              size: 90,
+                              onTap: () => SignsScreen.onSignTap(context, sign,
+                                  isVibration: isVibration)),
+                      ],
+                    ),
+                  ],
+                ].animate(interval: 50.ms).fadeIn(duration: 200.ms)),
           const SizedBox(height: 48),
         ],
       ),

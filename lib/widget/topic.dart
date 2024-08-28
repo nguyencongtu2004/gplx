@@ -37,6 +37,14 @@ class Topic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String topicStatus = (correctQuestion == 0 && wrongQuestion == 0)
+        ? ''
+        : (correctQuestion == 0 && wrongQuestion != 0)
+        ? '$wrongQuestion câu sai'
+        : (correctQuestion != 0 && wrongQuestion == 0)
+        ? '$correctQuestion câu đúng'
+        : '$wrongQuestion câu sai | $correctQuestion câu đúng';
+
     return Padding(
       padding: padding,
       child: GestureDetector(
@@ -79,6 +87,8 @@ class Topic extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -116,9 +126,10 @@ class Topic extends StatelessWidget {
                       textAlign: TextAlign.start,
                     ),
                   ),
+                  if (topicStatus.isNotEmpty)
                   Expanded(
                     child: Text(
-                      '$wrongQuestion câu sai | $correctQuestion câu đúng',
+                      topicStatus,
                       style: const TextStyle(
                         fontSize: 10,
                       ),

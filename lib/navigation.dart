@@ -77,6 +77,8 @@ final GoRouter router = GoRouter(
                 .withOpacity(0.1),
             selectedIndex: allRoutePages.indexWhere((element) => element.route == state.fullPath),
             onDestinationSelected: (index) {
+              // Refresh lại màn hình khi chuyển đổi
+              router.refresh();
               context.go(allRoutePages[index].route);
             },
             destinations: allRoutePages.map<NavigationDestination>(

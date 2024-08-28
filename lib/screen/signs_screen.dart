@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/provider/question_provider.dart';
+import 'package:gplx/screen/learn_screen.dart';
 import 'package:gplx/widget/sign_item.dart';
 import 'package:vibration/vibration.dart';
 
@@ -264,7 +266,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
                     size: 120,
                     onTap: () => SignsScreen.onSignTap(context, sign, isVibration: isVibration),
                   );
-                }).toList(),
+                }).toList().animate(interval: 100.ms).fadeIn(duration: 200.ms),
               ),
             );
           }).toList(),

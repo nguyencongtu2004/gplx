@@ -165,6 +165,9 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
         // thêm cho cân
         actions: [
           IconButton(
+            style: ButtonStyle(
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+            ),
             onPressed: () {},
             icon: const Icon(
               Icons.list,

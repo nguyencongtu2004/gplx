@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gplx/provider/question_provider.dart';
 import 'package:gplx/widget/custom_card.dart';
 import 'package:gplx/widget/topic.dart';
 import 'package:vibration/vibration.dart';
 
+import '../model/question.dart';
 import '../provider/settings_provider.dart';
 import '../provider/topic_provider.dart';
 
@@ -25,6 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('HomeScreen build');
     final isVibration = ref.watch(settingsProvider).isVibration;
     final double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -185,14 +188,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                           for (int i = 0; i <= 7; i++)
                             Topic(
+                              // todo: fix không cập nhật khi thay đổi dữ liệu
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               title: kTopic[i]!,
                               imageUrl: 'assets/images/place-holder.png',
-                              progress: 0.5,
-                              correctQuestion: 10,
-                              wrongQuestion: 5,
-                              learnedQuestion: 15,
-                              totalQuestion: 60,
+                              progress: ref.read(questionProvider.notifier).getProgressByTopic(i),
+                              correctQuestion: ref.read(questionProvider.notifier).getCorrectQuestionByTopic(i),
+                              wrongQuestion: ref.read(questionProvider.notifier).getWrongQuestionByTopic(i),
+                              learnedQuestion: ref.read(questionProvider.notifier).getAnsweredQuestionByTopic(i),
+                              totalQuestion: ref.read(questionProvider.notifier).getTotalQuestionByTopic(i),
                               backgroundColor: const Color(0xFF99F4C5),
                               titleColor: const Color(0xFF121212),
                               progressColor: const Color(0xFF0A6F4E),

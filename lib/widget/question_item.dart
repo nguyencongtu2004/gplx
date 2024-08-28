@@ -29,6 +29,7 @@ class QuestionItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         color: isSelecting ? Colors.yellow[200] : Colors.transparent,
+        height: 64, // 64 + 16 (của padding) = 80 (kích thước của mỗi item)
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
