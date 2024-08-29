@@ -108,6 +108,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
 
   @override
   Widget build(BuildContext context) {
+    print('Rebuild QuestionAnswer');
     final currentQuestion = widget.currentQuestion;
     final totalQuestion = widget.totalQuestion;
     final currentQuestionIndex = widget.currentQuestionIndex;
@@ -160,6 +161,9 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                 ),
                 IconButton(
                     onPressed: onSaved,
+                    tooltip: _currentState.isSaved
+                        ? 'Bỏ lưu câu hỏi'
+                        : 'Lưu câu hỏi',
                     icon: Icon(
                       _currentState.isSaved
                           ? Icons.bookmark
@@ -201,7 +205,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
             children: currentQuestion.answers.map((answer) {
               final answeredIndex = currentQuestion.answers.indexOf(answer);
               return AnswerItem(
-                  answer: answer,
+                  answer: '${answeredIndex + 1}- $answer',
                   answerState: getAnswerState(answeredIndex),
                   onTap: () {
                     onAnswer(answeredIndex);

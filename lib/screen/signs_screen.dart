@@ -221,6 +221,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
               snap: true,
               actions: [
                 IconButton(
+                  tooltip: 'Thêm',
                   onPressed: onMoreButtonPressed,
                   icon: const Icon(Icons.more_vert),
                 )

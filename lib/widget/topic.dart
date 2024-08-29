@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
 
-class Topic extends StatelessWidget {
-  const Topic({
+class TopicItem extends StatelessWidget {
+  const TopicItem({
     super.key,
     required this.title,
     required this.imageUrl,

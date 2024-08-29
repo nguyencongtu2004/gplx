@@ -228,6 +228,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                 ? CrossFadeState.showSecond
                 : CrossFadeState.showFirst,
             firstChild: IconButton(
+              tooltip: 'Danh sách câu hỏi',
               style: totalQuestion == 0 ? ButtonStyle(
                 overlayColor: WidgetStateProperty.all(Colors.transparent),
               ) : null,
@@ -240,6 +241,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                       totalQuestion == 0 ? Colors.transparent : Colors.black),
             ),
             secondChild: IconButton(
+              tooltip: 'Đóng',
               onPressed: () {
                 hideCustomTopSheet();
               },

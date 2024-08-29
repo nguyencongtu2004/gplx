@@ -34,7 +34,7 @@ class QuestionProvider extends StateNotifier<List<Question>> {
         questionId, updatedQuestion.isSaved);
   }
 
-  /*Future<void> questionStatusChange(
+  Future<void> questionStatusChange(
       int questionId, QuestionStatus status) async {
     final questionIndex =
         state.indexWhere((question) => question.id == questionId);
@@ -43,22 +43,7 @@ class QuestionProvider extends StateNotifier<List<Question>> {
     state[questionIndex] = updatedQuestion;
 
     await QuestionsTable.updateQuestionStatus(questionId, status);
-  }*/
-
-  Future<void> questionStatusChange(int questionId, QuestionStatus status) async {
-    final questionIndex = state.indexWhere((question) => question.id == questionId);
-    final updatedQuestion = state[questionIndex].copyWith(questionStatus: status);
-
-    // Cập nhật danh sách câu hỏi
-    state = [
-      ...state.sublist(0, questionIndex),
-      updatedQuestion,
-      ...state.sublist(questionIndex + 1),
-    ];
-
-    await QuestionsTable.updateQuestionStatus(questionId, status);
   }
-
 
   Future<void> resetQuestionsState() async {
     state = state
@@ -97,20 +82,6 @@ class QuestionProvider extends StateNotifier<List<Question>> {
           .where((question) =>
               question.chapter == chapter &&
               question.questionStatus == QuestionStatus.wrong)
-          .length;
-    }
-  }
-
-  int getSavedQuestionByTopic(int chapter) {
-    if (chapter == 0) {
-      return state
-          .where((question) =>
-              question.isFailingPoint && question.isSaved == true)
-          .length;
-    } else {
-      return state
-          .where((question) =>
-              question.chapter == chapter && question.isSaved == true)
           .length;
     }
   }

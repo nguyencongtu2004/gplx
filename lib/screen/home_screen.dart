@@ -18,11 +18,27 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  var isShowTopic = false;
+  var isShowTopic = true;
 
   void onTestClick() {
     print('Thi thử');
     context.push('/test-list');
+  }
+
+  void onTopicClick(int index) {
+    print('Học theo chủ đề');
+    context.push('/learn/$index').then((value) {
+      // cập nhật tiến trình của chủ đề khi quay lại
+      setState(() {});
+    });
+  }
+
+  void onAllQuestionClick() {
+    print('Tất cả câu hỏi');
+    context.push('/learn/-1').then((value) {
+      // cập nhật tiến trình của chủ đề khi quay lại
+      setState(() {});
+    });
   }
 
   @override
@@ -123,10 +139,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     backgroundColor: const Color(0xFFBEFFE7),
                     titleColor: const Color(0xFF011D26),
                     isVibration: isVibration,
-                    onTap: () async {
-                      print('Tất cả câu hỏi');
-                      context.push('/learn/-1');
-                    },
+                    onTap: onAllQuestionClick,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -136,8 +149,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             if (isVibration && (await Vibration.hasVibrator() ?? false)) {
                               Vibration.vibrate(duration: 20);
                             }
-                            print('Tất cả câu hỏi');
-                            context.push('/learn/-1');
+                            onAllQuestionClick();
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: const Color(0xFF011D26),
@@ -187,7 +199,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           ),
                           for (int i = 0; i <= 7; i++)
-                            Topic(
+                            TopicItem(
                               // todo: fix không cập nhật khi thay đổi dữ liệu
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               title: kTopic[i]!,
@@ -203,8 +215,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               backgroundProgressColor: const Color(0xFF59D3AE),
                               isVibration: isVibration,
                               onTap: () {
-                                print(kTopic[i]);
-                                context.push('/learn/$i');
+                                onTopicClick(i);
                               },
                             ),
                           const SizedBox(height: 8),
