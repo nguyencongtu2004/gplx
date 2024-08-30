@@ -265,7 +265,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                     ),
                   ],
                 ].animate(interval: 50.ms).fadeIn(duration: 200.ms)),
-          const SizedBox(height: 48),
+          const SizedBox(height: 50 + 16),
         ],
       ),
     );

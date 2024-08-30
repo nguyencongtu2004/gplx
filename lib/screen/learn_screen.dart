@@ -25,10 +25,11 @@ class LearnScreen extends ConsumerStatefulWidget {
 class _LearnScreenState extends ConsumerState<LearnScreen>
     with SingleTickerProviderStateMixin {
   final _pageController = PageController();
+  late ScrollController _scrollController;
   late final List<Question> allQuestions;
   late final List<QuestionState> questionStates;
   late final int totalQuestion;
-  late ScrollController _scrollController;
+  late final List<int> questionId;
 
   // UI variables
   var isShowPreviousButton = false;
@@ -67,47 +68,48 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
       curve: Curves.easeInOut,
     ));
 
+    allQuestions = ref.read(questionProvider);
     switch (widget.chapter) {
       case -4:
-        allQuestions = ref
-            .read(questionProvider)
-            .where(
-                (question) => question.questionStatus == QuestionStatus.wrong)
+        questionId = allQuestions
+            .where((question) => question.questionStatus == QuestionStatus.wrong)
+            .map((e) => e.id)
             .toList();
         break;
       case -3:
-        allQuestions = ref
-            .read(questionProvider)
+        questionId = allQuestions
             .where((question) => question.isHard)
+            .map((e) => e.id)
             .toList();
         break;
       case -2:
-        allQuestions = ref
-            .read(questionProvider)
+        questionId = allQuestions
             .where((question) => question.isSaved)
+            .map((e) => e.id)
             .toList();
         break;
       case -1:
-        allQuestions = ref.read(questionProvider);
+        questionId = allQuestions.map((e) => e.id).toList();
         break;
       case 0:
-        allQuestions = ref
-            .read(questionProvider)
+        questionId = allQuestions
             .where((question) => question.isFailingPoint)
+            .map((e) => e.id)
             .toList();
         break;
       default:
-        allQuestions = ref
-            .read(questionProvider)
+        questionId = allQuestions
             .where((question) => question.chapter == widget.chapter)
+            .map((e) => e.id)
             .toList();
     }
+
     questionStates = List.generate(
         allQuestions.length,
         (index) => QuestionState(
             isSaved: allQuestions[index].isSaved,
             answerState: AnswerState.none));
-    totalQuestion = allQuestions.length;
+    totalQuestion = questionId.length;
   }
 
   void onPreviousClick() {
@@ -143,20 +145,20 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
         child: ListView(
           controller: _scrollController,
           children: [
-            for (int i = 0; i < totalQuestion; i++)
+            for (final id in questionId)
               Column(
                 children: [
                   QuestionItem(
-                    key: ValueKey(allQuestions[i].id),
-                    question: allQuestions[i],
-                    index: i,
-                    isSelecting: _pageController.page == i,
+                    key: ValueKey(id),
+                    question: allQuestions[id - 1],
+                    index: questionId.indexOf(id),
+                    isSelecting: _pageController.page == questionId.indexOf(id),
                     onTap: () {
-                      onQuestionChange(i);
+                      onQuestionChange(questionId.indexOf(id));
                       hideCustomTopSheet();
                     },
                   ),
-                  if (i != totalQuestion - 1)
+                  if (id != totalQuestion - 1)
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Divider(),
@@ -265,24 +267,22 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
             )
           : Stack(
               children: [
-                PageView.builder(
+                PageView(
                   controller: _pageController,
-                  itemCount: totalQuestion,
-                  itemBuilder: (context, index) {
-                    return QuestionAnswer(
-                      key: ValueKey(allQuestions[index].id),
-                      currentQuestion: allQuestions[index],
-                      currentQuestionIndex: index + 1,
-                      totalQuestion: totalQuestion,
-                      questionState: questionStates[index],
-                      onStateChanged: (newState) {
-                        setState(() {
-                          questionStates[index] = newState;
-                          // todo: update question state
-                        });
-                      },
-                    );
-                  },
+                  children: [
+                    for (final id in questionId)
+                      QuestionAnswer(
+                        key: ValueKey(id),
+                        currentQuestion: allQuestions[id - 1],
+                        currentQuestionIndex: questionId.indexOf(id) + 1,
+                        totalQuestion: totalQuestion,
+                        questionState: questionStates[questionId.indexOf(id)],
+                        onStateChanged: (newState) {
+                          setState(() {
+                            questionStates[questionId.indexOf(id)] = newState;
+                          });
+                        }),
+                  ],
                   onPageChanged: (index) {
                     setState(() {
                       currentQuestionIndex = index;
@@ -351,6 +351,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                       ),
                     ),
                   ),
+                // Custom top sheet
                 if (isShowCustomTopSheet)
                   FadeTransition(
                     opacity: _fadeAnimation,
@@ -360,7 +361,6 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                       onDismiss: hideCustomTopSheet,
                     ),
                   ),
-
                 if (isShowCustomTopSheet) buildCustomTopSheet(),
               ],
             ),

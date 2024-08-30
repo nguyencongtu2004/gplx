@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gplx/provider/question_provider.dart';
+import 'package:gplx/screen/home_screen.dart';
 import 'package:gplx/widget/information.dart';
 
 import '../provider/license_class_provider.dart';
@@ -124,6 +125,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
                 ref.read(questionProvider.notifier).resetQuestionsState();
+                // todo: cập nhật tiến trình học
                 // todo: toast thông báo
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
