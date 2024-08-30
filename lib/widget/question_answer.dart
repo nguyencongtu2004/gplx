@@ -108,7 +108,6 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
 
   @override
   Widget build(BuildContext context) {
-    print('Rebuild QuestionAnswer');
     final currentQuestion = widget.currentQuestion;
     final totalQuestion = widget.totalQuestion;
     final currentQuestionIndex = widget.currentQuestionIndex;

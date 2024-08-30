@@ -325,6 +325,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                                 ),
                               ),
                             ),
+                          const Spacer(),
                           if (isShowNextButton)
                             Expanded(
                               child: MaterialButton(

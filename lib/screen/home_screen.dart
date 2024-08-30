@@ -6,7 +6,6 @@ import 'package:gplx/widget/custom_card.dart';
 import 'package:gplx/widget/topic.dart';
 import 'package:vibration/vibration.dart';
 
-import '../model/question.dart';
 import '../provider/settings_provider.dart';
 import '../provider/topic_provider.dart';
 
