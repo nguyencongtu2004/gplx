@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gplx/model/test_answer_state.dart';
+import 'package:gplx/provider/tests_provider.dart';
+import 'package:gplx/screen/test_list_screen.dart';
 import 'package:gplx/widget/time_bar.dart';
 
 import '../model/question.dart';
@@ -14,9 +17,11 @@ import '../widget/question_list_to_test.dart';
 class TestScreen extends ConsumerStatefulWidget {
   const TestScreen({
     super.key,
+    required this.licenseClass,
     required this.testNumber,
   });
 
+  final String licenseClass;
   final int testNumber;
 
   @override
@@ -30,8 +35,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   late final List<Question> allQuestions;
   late final List<QuestionState> questionStates;
   late final int totalQuestion;
-  late var notAnswered = 0;
+  late final List<int> questionId;
 
+  var notAnswered = 0;
   var isQuestionListVisible = true;
   var isShowPreviousButton = false;
   var isShowNextButton = true;
@@ -41,13 +47,21 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   @override
   void initState() {
     super.initState();
-    allQuestions = ref.read(questionProvider).sublist(0, 35);
+    allQuestions = ref.read(questionProvider);
+    questionId = ref
+        .read(testProvider)
+        .firstWhere((test) =>
+            test.testNumber == widget.testNumber &&
+            test.licenseClass == widget.licenseClass)
+        .questions;
+
     questionStates = List.generate(
-        allQuestions.length,
+        questionId.length,
         (index) => QuestionState(
             isSaved: allQuestions[index].isSaved,
-            answerState: AnswerState.none));
-    totalQuestion = allQuestions.length;
+            answerState: AnswerState.notAnswered));
+    totalQuestion = questionId.length;
+
     notAnswered = totalQuestion;
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (timeLeft <= 0) {
@@ -128,7 +142,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Hết giờ'),
-          content: const Text('Hết giờ làm bài!'),
+          content: const Text('Đã hết giờ làm bài!'),
           actions: [
             TextButton(
               onPressed: () {
@@ -163,30 +177,21 @@ class _TestScreenState extends ConsumerState<TestScreen> {
         notAnswer++;
       }
     }
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Kết quả'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Số câu đúng: $correctAnswer'),
-              Text('Số câu sai: $wrongAnswer'),
-              Text('Số câu chưa trả lời: $notAnswer'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Đóng'),
-            ),
-          ],
-        );
-      },
+
+    // todo: chấm bài và cập nhật vào testProvider
+    final result = correctAnswer >= 26 ? TestResult.pass : TestResult.failWithFallingPoints;
+
+    final TestAnswerState testAnswerState = TestAnswerState(
+      result: result,
+      correctAnswers: correctAnswer,
+      incorrectAnswers: wrongAnswer,
+      notAnswered: notAnswer,
+      questionStates: questionStates,
     );
+    ref.read(testProvider.notifier).updateTestAnswerState(
+        widget.testNumber, widget.licenseClass, testAnswerState);
+
+    // context.push();
   }
 
   @override
@@ -234,30 +239,30 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                     timeLeft: timeLeft,
                   ),
                   Expanded(
-                    child: PageView.builder(
+                    child: PageView(
                       controller: _pageController,
-                      itemCount: totalQuestion,
-                      itemBuilder: (context, index) {
-                        return QuestionAnswer(
-                          key: ValueKey(allQuestions[index].id),
-                          currentQuestion: allQuestions[index],
-                          currentQuestionIndex: index + 1,
-                          totalQuestion: totalQuestion,
-                          questionState: questionStates[index],
-                          onStateChanged: (newState) {
-                            setState(() {
-                              questionStates[index] = newState;
-                              // Update notAnswered
-                              if (newState.answerState == AnswerState.none) {
-                                notAnswered++;
-                              } else {
-                                notAnswered--;
-                              }
-                              print('Not answered: $notAnswered');
-                            });
-                          },
-                        );
-                      },
+                      children: [
+                        for (final id in questionId)
+                          QuestionAnswer(
+                              key: ValueKey(id),
+                              currentQuestion: allQuestions[id - 1],
+                              currentQuestionIndex: questionId.indexOf(id) + 1,
+                              totalQuestion: totalQuestion,
+                              questionState: questionStates[questionId.indexOf(id)],
+                              onStateChanged: (newState) {
+                                setState(() {
+                                  questionStates[questionId.indexOf(id)] = newState;
+                                  // Update notAnswered
+                                  if (newState.answerState ==
+                                      AnswerState.notAnswered) {
+                                    notAnswered++;
+                                  } else {
+                                    notAnswered--;
+                                  }
+                                  print('Not answered: $notAnswered');
+                                });
+                              },),
+                      ],
                       onPageChanged: (index) {
                         setState(() {
                           isShowPreviousButton = index != 0;

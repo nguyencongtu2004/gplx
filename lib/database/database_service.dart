@@ -68,10 +68,20 @@ class DatabaseService {
         licenseClass TEXT
       )
     ''');
+    await db.execute('''
+      CREATE TABLE tests (
+        id TEXT PRIMARY KEY,
+        testNumber INTEGER,
+        licenseClass TEXT,
+        questions TEXT,
+        answerState TEXT
+      )
+    ''');
 
     // Nhập dữ liệu từ CSV
     await _importCSVtoTable(db, 'assets/data/questions.csv', 'questions');
     await _importCSVtoTable(db, 'assets/data/signs.csv', 'signs');
+    await _importCSVtoTable(db, 'assets/data/tests.csv', 'tests');
     await db.insert('settings',
         {'id': 1, 'isDarkMode': 0, 'isVibration': 1, 'licenseClass': 'B2'});
   }

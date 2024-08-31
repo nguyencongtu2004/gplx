@@ -105,10 +105,10 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
     }
 
     questionStates = List.generate(
-        allQuestions.length,
+        questionId.length,
         (index) => QuestionState(
             isSaved: allQuestions[index].isSaved,
-            answerState: AnswerState.none));
+            answerState: AnswerState.notAnswered));
     totalQuestion = questionId.length;
   }
 

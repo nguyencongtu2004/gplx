@@ -15,8 +15,9 @@ class TestInfoScreen extends ConsumerWidget {
   final int totalQuestion = 30;
   final int minCorrect = 26;
 
-  void onTestClick(BuildContext context) {
-    context.pushReplacement('/test/$testNumber');
+  void onTestClick(BuildContext context, WidgetRef ref) {
+    final licenseClass = ref.read(licenseClassProvider);
+    context.pushReplacement('/test/$licenseClass/$testNumber');
   }
 
   @override
@@ -38,7 +39,7 @@ class TestInfoScreen extends ConsumerWidget {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton(
-          onPressed: () => onTestClick(context),
+          onPressed: () => onTestClick(context, ref),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
             minimumSize: const Size(double.infinity, 50),

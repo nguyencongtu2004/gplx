@@ -6,6 +6,7 @@ import 'package:gplx/provider/license_class_provider.dart';
 import '../provider/question_provider.dart';
 import '../provider/settings_provider.dart';
 import '../provider/sign_provider.dart';
+import '../provider/tests_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -54,6 +55,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     } catch (e) {
       print('Lỗi load cài đặt: $e');
       // Có thể hiển thị một thông báo lỗi hoặc thử tải lại dữ liệu
+    }
+
+    try {
+      await ref.read(testProvider.notifier).loadTests();
+    } catch (e) {
+      print('Lỗi load đề thi: $e');
     }
 
     // Chuyển hướng tới màn hình chính

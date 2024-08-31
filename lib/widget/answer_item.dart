@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart'; // Import gói animate
 
-enum AnswerState { none, answered, correct, wrong }
+enum AnswerState { notAnswered, answered, correct, wrong }
 
 class AnswerItem extends StatelessWidget {
   const AnswerItem({
@@ -18,7 +18,7 @@ class AnswerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Xác định màu nền dựa vào trạng thái câu trả lời
-    final Color backgroundColor = answerState == AnswerState.none
+    final Color backgroundColor = answerState == AnswerState.notAnswered
         ? Colors.transparent
         : answerState == AnswerState.correct
         ? const Color(0x5900DB57)
@@ -34,12 +34,12 @@ class AnswerItem extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              answerState == AnswerState.none
+              answerState == AnswerState.notAnswered
                   ? Icons.circle_outlined
                   : answerState == AnswerState.correct
                   ? Icons.check_circle
                   : Icons.cancel,
-              color: answerState == AnswerState.none
+              color: answerState == AnswerState.notAnswered
                   ? Colors.black
                   : Colors.white,
             ),

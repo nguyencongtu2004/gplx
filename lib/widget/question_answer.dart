@@ -70,7 +70,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
   }
 
   Future<void> onAnswer(int answeredIndex) async {
-    if (_currentState.answerState != AnswerState.none) {
+    if (_currentState.answerState != AnswerState.notAnswered) {
       return;
     }
     final isCorrect = answeredIndex == widget.currentQuestion.correctAnswer - 1;
@@ -113,8 +113,8 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
     final currentQuestionIndex = widget.currentQuestionIndex;
 
     AnswerState getAnswerState(int index) {
-      if (_currentState.answerState == AnswerState.none) {
-        return AnswerState.none;
+      if (_currentState.answerState == AnswerState.notAnswered) {
+        return AnswerState.notAnswered;
       }
       if (index == widget.currentQuestion.correctAnswer - 1) {
         return AnswerState.correct;
@@ -122,7 +122,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
       if (index == _currentState.wrongAnswer) {
         return AnswerState.wrong;
       }
-      return AnswerState.none;
+      return AnswerState.notAnswered;
     }
 
     return SingleChildScrollView(
@@ -212,7 +212,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
             }).toList(),
           ),
           // Giải thích
-          if (_currentState.answerState != AnswerState.none)
+          if (_currentState.answerState != AnswerState.notAnswered)
             Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

@@ -15,7 +15,7 @@ class QuestionListToTest extends StatelessWidget {
     final String text = (index + 1).toString();
     final Color color;
     switch (answerState) {
-      case AnswerState.none:
+      case AnswerState.notAnswered:
         color = Colors.transparent;
         break;
       case AnswerState.answered:
