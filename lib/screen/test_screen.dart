@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gplx/model/test_answer_state.dart';
 import 'package:gplx/provider/tests_provider.dart';
-import 'package:gplx/screen/test_list_screen.dart';
 import 'package:gplx/widget/time_bar.dart';
 
 import '../model/question.dart';
@@ -29,7 +29,6 @@ class TestScreen extends ConsumerStatefulWidget {
 }
 
 class _TestScreenState extends ConsumerState<TestScreen> {
-  static const int totalTime = 1800; // 30 minutes = 1800 seconds
   final _pageController = PageController();
 
   late final List<Question> allQuestions;
@@ -37,12 +36,15 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   late final int totalQuestion;
   late final List<int> questionId;
 
+  late String testId;
+  late int totalTime; // 30 minutes = 1800 seconds
+  late int timeLeft;
+
   var notAnswered = 0;
   var isQuestionListVisible = true;
   var isShowPreviousButton = false;
   var isShowNextButton = true;
   Timer? timer;
-  var timeLeft = totalTime;
 
   @override
   void initState() {
@@ -58,11 +60,22 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     questionStates = List.generate(
         questionId.length,
         (index) => QuestionState(
-            isSaved: allQuestions[index].isSaved,
+            isSaved: allQuestions[questionId[index] - 1].isSaved,
             answerState: AnswerState.notAnswered));
     totalQuestion = questionId.length;
-
     notAnswered = totalQuestion;
+    testId = ref
+        .read(testProvider)
+        .firstWhere((test) =>
+            test.testNumber == widget.testNumber &&
+            test.licenseClass == widget.licenseClass)
+        .id;
+    totalTime = ref
+            .read(testProvider.notifier)
+            .getTestInformation(widget.licenseClass)
+            .timeLimit *
+        60;
+    timeLeft = totalTime;
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (timeLeft <= 0) {
         timer.cancel();
@@ -165,21 +178,41 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     if (!isSubmit) return;
     timer?.cancel();
 
-    int correctAnswer = 0;
-    int wrongAnswer = 0;
-    int notAnswer = 0;
-    for (int i = 0; i < totalQuestion; i++) {
-      if (questionStates[i].answerState == AnswerState.correct) {
-        correctAnswer++;
-      } else if (questionStates[i].answerState == AnswerState.wrong) {
-        wrongAnswer++;
-      } else {
-        notAnswer++;
-      }
-    }
+    markingAndUpdate();
 
-    // todo: chấm bài và cập nhật vào testProvider
-    final result = correctAnswer >= 26 ? TestResult.pass : TestResult.failWithFallingPoints;
+    context.pushReplacement('/test-result/$testId');
+  }
+
+  void markingAndUpdate() {
+    final correctAnswer = questionStates
+        .where((element) => element.answerState == AnswerState.correct)
+        .length;
+    final wrongAnswer = questionStates
+        .where((element) => element.answerState == AnswerState.wrong)
+        .length;
+    final notAnswer = questionStates
+        .where((element) => element.answerState == AnswerState.notAnswered)
+        .length;
+
+    final testInfo =
+        ref.read(testProvider.notifier).getTestInformation(widget.licenseClass);
+    final failingPointQuestionIds =
+        ref.read(testProvider.notifier).getFailingPointQuestionIds();
+    TestResult result;
+
+    if (correctAnswer >= testInfo.minimumPassingScore) {
+      result = TestResult.passed;
+    } else {
+      for (final id in questionId) {
+        final index = questionId.indexOf(id);
+        if (questionStates[index].answerState == AnswerState.wrong &&
+            failingPointQuestionIds.contains(id)) {
+          result = TestResult.failedWithFallingPoints;
+          break;
+        }
+      }
+      result = TestResult.failed;
+    }
 
     final TestAnswerState testAnswerState = TestAnswerState(
       result: result,
@@ -188,10 +221,9 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       notAnswered: notAnswer,
       questionStates: questionStates,
     );
-    ref.read(testProvider.notifier).updateTestAnswerState(
-        widget.testNumber, widget.licenseClass, testAnswerState);
-
-    // context.push();
+    ref
+        .read(testProvider.notifier)
+        .updateTestAnswerState(testId, testAnswerState);
   }
 
   @override
@@ -244,24 +276,27 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                       children: [
                         for (final id in questionId)
                           QuestionAnswer(
-                              key: ValueKey(id),
-                              currentQuestion: allQuestions[id - 1],
-                              currentQuestionIndex: questionId.indexOf(id) + 1,
-                              totalQuestion: totalQuestion,
-                              questionState: questionStates[questionId.indexOf(id)],
-                              onStateChanged: (newState) {
-                                setState(() {
-                                  questionStates[questionId.indexOf(id)] = newState;
-                                  // Update notAnswered
-                                  if (newState.answerState ==
-                                      AnswerState.notAnswered) {
-                                    notAnswered++;
-                                  } else {
-                                    notAnswered--;
-                                  }
-                                  print('Not answered: $notAnswered');
-                                });
-                              },),
+                            key: ValueKey(id),
+                            currentQuestion: allQuestions[id - 1],
+                            currentQuestionIndex: questionId.indexOf(id) + 1,
+                            totalQuestion: totalQuestion,
+                            questionState:
+                                questionStates[questionId.indexOf(id)],
+                            onStateChanged: (newState) {
+                              setState(() {
+                                questionStates[questionId.indexOf(id)] =
+                                    newState;
+                                // Update notAnswered
+                                if (newState.answerState ==
+                                    AnswerState.notAnswered) {
+                                  notAnswered++;
+                                } else {
+                                  notAnswered--;
+                                }
+                                print('Not answered: $notAnswered');
+                              });
+                            },
+                          ),
                       ],
                       onPageChanged: (index) {
                         setState(() {

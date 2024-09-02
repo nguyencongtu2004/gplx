@@ -9,6 +9,7 @@ import 'package:gplx/screen/signs_screen.dart';
 import 'package:gplx/screen/splash_screen.dart';
 import 'package:gplx/screen/test_info_screen.dart';
 import 'package:gplx/screen/test_list_screen.dart';
+import 'package:gplx/screen/test_result_screen.dart';
 import 'package:gplx/screen/test_screen.dart';
 
 class RoutePage {
@@ -131,6 +132,12 @@ final GoRouter router = GoRouter(
           final licenseClass = state.pathParameters['licenseClass']!;
           final testNumber = int.parse(state.pathParameters['testNumber']!);
           return TestScreen(licenseClass: licenseClass, testNumber: testNumber);
+        }),
+    GoRoute(
+        path: '/test-result/:testId',
+        builder: (context, state) {
+          final testId = state.pathParameters['testId']!;
+          return TestResultScreen(testId: testId);
         }),
   ],
 );

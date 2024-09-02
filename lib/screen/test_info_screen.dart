@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gplx/model/test_information.dart';
+import 'package:gplx/provider/tests_provider.dart';
 
 import '../provider/license_class_provider.dart';
 
@@ -11,9 +13,6 @@ class TestInfoScreen extends ConsumerWidget {
   });
 
   final int testNumber;
-  final int testTime = 30;
-  final int totalQuestion = 30;
-  final int minCorrect = 26;
 
   void onTestClick(BuildContext context, WidgetRef ref) {
     final licenseClass = ref.read(licenseClassProvider);
@@ -23,12 +22,16 @@ class TestInfoScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final String licenseClass = ref.read(licenseClassProvider);
+    final TestInformation testInformation = ref.read(testProvider.notifier).getTestInformation(licenseClass);
     return Scaffold(
       appBar: AppBar(
         title: const SizedBox(),
         actions: [
           IconButton(
             onPressed: () {},
+            style: ButtonStyle(
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+            ),
             icon: const Icon(
               Icons.list,
               color: Colors.transparent,
@@ -79,9 +82,9 @@ class TestInfoScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                  'Tổng số câu hỏi: $totalQuestion'
-                  '\nThời gian làm bài: $testTime phút'
-                  '\nSố câu đúng tối thiểu: $minCorrect/$totalQuestion câu'
+                  'Tổng số câu hỏi: ${testInformation.totalQuestions}'
+                  '\nThời gian làm bài: ${testInformation.timeLimit} phút'
+                  '\nSố câu đúng tối thiểu: ${testInformation.minimumPassingScore}/${testInformation.totalQuestions} câu'
                   '\nKhi làm sai bất lỳ câu điểm liệt nào, thí sinh sẽ bị trượt.',
                   style: const TextStyle(
                     fontSize: 16,

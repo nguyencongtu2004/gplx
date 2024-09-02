@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/model/test_answer_state.dart';
+import 'package:gplx/model/test_information.dart';
 import 'package:gplx/widget/answer_item.dart';
 
 import '../database/tests_table.dart';
@@ -26,13 +27,17 @@ class TestProvider extends StateNotifier<List<Test>> {
     }
   }
 
-  Future<void> updateTestAnswerState(int testNumber, String licenseClass, TestAnswerState testAnswerState) async {
-    final test = state.firstWhere((test) => test.testNumber == testNumber && test.licenseClass == licenseClass);
+  Future<void> updateTestAnswerState(String testId, TestAnswerState testAnswerState) async {
+    final test = state.firstWhere((test) => test.id == testId);
     final updatedTest = test.copyWith(testAnswerState: testAnswerState);
-    final updatedTests = state.map((t) => t.testNumber == testNumber && t.licenseClass == licenseClass ? updatedTest : t).toList();
+    final updatedTests = state.map((t) => t.id == testId ? updatedTest : t).toList();
     state = updatedTests;
 
-    await TestsTable.updateTestAnswerState(updatedTest.id, testAnswerState);
+    await TestsTable.updateTestAnswerState(testId, testAnswerState);
+  }
+
+  List<int> getFailingPointQuestionIds() {
+    return [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 33, 35, 36, 37, 40, 43, 45, 46, 47, 48, 49, 50, 51, 52, 53, 84, 91, 99, 101, 109, 112, 114, 118, 119, 143, 145, 147, 150, 153, 154, 161, 199, 200, 210, 211, 214, 221, 227, 231, 242, 245, 248, 258, 260, 261, 262];
   }
 
   List<int> generateTestSet(String licenseClass) {
@@ -204,6 +209,71 @@ class TestProvider extends StateNotifier<List<Test>> {
 
     selectedQuestions.sort();
     return selectedQuestions;
+  }
+
+  TestInformation getTestInformation(String licenseClass) {
+    final int totalQuestions;
+    final int timeLimit; // in minutes
+    final int minimumPassingScore;
+    switch (licenseClass) {
+      case "A1":
+        totalQuestions = 25;
+        timeLimit = 19;
+        minimumPassingScore = 21;
+        break;
+      case "A2":
+        totalQuestions = 25;
+        timeLimit = 19;
+        minimumPassingScore = 23;
+        break;
+      case "A3":
+        totalQuestions = 25;
+        timeLimit = 19;
+        minimumPassingScore = 22;
+        break;
+      case "A4":
+        totalQuestions = 25;
+        timeLimit = 19;
+        minimumPassingScore = 22;
+        break;
+      case "B1":
+        totalQuestions = 30;
+        timeLimit = 20;
+        minimumPassingScore = 27;
+        break;
+      case "B2":
+        totalQuestions = 35;
+        timeLimit = 22;
+        minimumPassingScore = 32;
+        break;
+      case "C":
+        totalQuestions = 40;
+        timeLimit = 24;
+        minimumPassingScore = 36;
+        break;
+      case "D":
+        totalQuestions = 45;
+        timeLimit = 26;
+        minimumPassingScore = 41;
+        break;
+      case "E":
+        totalQuestions = 45;
+        timeLimit = 26;
+        minimumPassingScore = 42;
+        break;
+      case "F":
+        totalQuestions = 45;
+        timeLimit = 26;
+        minimumPassingScore = 41;
+        break;
+      default:
+        throw Exception('Invalid license class');
+    }
+
+    return TestInformation(
+      totalQuestions: totalQuestions,
+      timeLimit: timeLimit,
+      minimumPassingScore: minimumPassingScore,);
   }
 
 }
