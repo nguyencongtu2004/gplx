@@ -24,7 +24,7 @@ class Test {
     final questions = questionsString.split(';').map((e) => int.parse(e)).toList();
     final TestAnswerState testAnswerState;
     if (map['answerState'].toString().isEmpty) {
-      testAnswerState = TestAnswerState(result: TestResult.notAnswered,);
+      testAnswerState = TestAnswerState(result: TestResult.notAnswered);
     } else {
       testAnswerState = TestAnswerState.fromJson(map['answerState']);
     }

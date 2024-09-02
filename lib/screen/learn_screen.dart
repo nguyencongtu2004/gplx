@@ -25,7 +25,7 @@ class LearnScreen extends ConsumerStatefulWidget {
 class _LearnScreenState extends ConsumerState<LearnScreen>
     with SingleTickerProviderStateMixin {
   final _pageController = PageController();
-  late ScrollController _scrollController;
+  final _scrollController = ScrollController();
   late final List<Question> allQuestions;
   late final List<QuestionState> questionStates;
   late final int totalQuestion;
@@ -44,8 +44,6 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
   @override
   void initState() {
     super.initState();
-
-    _scrollController = ScrollController();
 
     _animationController = AnimationController(
       vsync: this,
@@ -72,7 +70,8 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
     switch (widget.chapter) {
       case -4:
         questionId = allQuestions
-            .where((question) => question.questionStatus == QuestionStatus.wrong)
+            .where(
+                (question) => question.questionStatus == QuestionStatus.wrong)
             .map((e) => e.id)
             .toList();
         break;
@@ -98,16 +97,14 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
             .toList();
         break;
       default:
-        questionId = allQuestions
-            .where((question) => question.chapter == widget.chapter)
-            .map((e) => e.id)
-            .toList();
+        throw UnimplementedError(
+            'Chapter ${widget.chapter} is not implemented');
     }
 
     questionStates = List.generate(
         questionId.length,
         (index) => QuestionState(
-            isSaved: allQuestions[index].isSaved,
+            isSaved: allQuestions[questionId[index] - 1].isSaved,
             answerState: AnswerState.notAnswered));
     totalQuestion = questionId.length;
   }
@@ -181,7 +178,8 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
     // sau khi khung hình hiện tại (frame) của widget tree đã được
     // render xong và các thay đổi đã được áp dụng.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final double position = currentQuestionIndex * 80 - 80 * 2; // 80 là chiều cao của mỗi item
+      final double position =
+          currentQuestionIndex * 80 - 80 * 2; // 80 là chiều cao của mỗi item
       if (currentQuestionIndex > 2) {
         _scrollController.jumpTo(position);
       }
@@ -231,9 +229,11 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                 : CrossFadeState.showFirst,
             firstChild: IconButton(
               tooltip: 'Danh sách câu hỏi',
-              style: totalQuestion == 0 ? ButtonStyle(
-                overlayColor: WidgetStateProperty.all(Colors.transparent),
-              ) : null,
+              style: totalQuestion == 0
+                  ? ButtonStyle(
+                      overlayColor: WidgetStateProperty.all(Colors.transparent),
+                    )
+                  : null,
               onPressed: () {
                 if (totalQuestion == 0) return;
                 showCustomTopSheet(context);
@@ -272,16 +272,16 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                   children: [
                     for (final id in questionId)
                       QuestionAnswer(
-                        key: ValueKey(id),
-                        currentQuestion: allQuestions[id - 1],
-                        currentQuestionIndex: questionId.indexOf(id) + 1,
-                        totalQuestion: totalQuestion,
-                        questionState: questionStates[questionId.indexOf(id)],
-                        onStateChanged: (newState) {
-                          setState(() {
-                            questionStates[questionId.indexOf(id)] = newState;
-                          });
-                        }),
+                          key: ValueKey(id),
+                          currentQuestion: allQuestions[id - 1],
+                          currentQuestionIndex: questionId.indexOf(id) + 1,
+                          totalQuestion: totalQuestion,
+                          questionState: questionStates[questionId.indexOf(id)],
+                          onStateChanged: (newState) {
+                            setState(() {
+                              questionStates[questionId.indexOf(id)] = newState;
+                            });
+                          }),
                   ],
                   onPageChanged: (index) {
                     setState(() {
@@ -353,7 +353,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                     ),
                   ),
                 // Custom top sheet
-                if (isShowCustomTopSheet)
+                if (isShowCustomTopSheet) ...[
                   FadeTransition(
                     opacity: _fadeAnimation,
                     child: ModalBarrier(
@@ -362,7 +362,8 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                       onDismiss: hideCustomTopSheet,
                     ),
                   ),
-                if (isShowCustomTopSheet) buildCustomTopSheet(),
+                  buildCustomTopSheet()
+                ]
               ],
             ),
     );

@@ -13,8 +13,7 @@ class SignsScreen extends ConsumerStatefulWidget {
   const SignsScreen({super.key});
 
   // Hiển thị thông tin chi tiết của biển báo khi người dùng chọn vào biển báo
-  static Future<void> onSignTap(BuildContext context, Sign sign,
-      {required bool isVibration}) async {
+  static Future<void> onSignTap(BuildContext context, Sign sign, {required bool isVibration}) async {
     if (isVibration && (await Vibration.hasVibrator() ?? false)) {
       Vibration.vibrate(duration: 15);
     }
@@ -197,7 +196,6 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
 
   @override
   Widget build(BuildContext context) {
-
     final isVibration =
         ref.watch(settingsProvider.select((value) => value.isVibration));
     return Scaffold(
@@ -266,7 +264,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
                     size: 120,
                     onTap: () => SignsScreen.onSignTap(context, sign, isVibration: isVibration),
                   );
-                }).toList().animate(interval: 100.ms).fadeIn(duration: 200.ms),
+                }).toList()/*.animate(interval: 100.ms).fadeIn(duration: 200.ms)*/,
               ),
             );
           }).toList(),

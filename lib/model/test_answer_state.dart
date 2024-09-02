@@ -3,10 +3,9 @@ import 'dart:convert';
 import 'package:gplx/model/question_state.dart';
 
 enum TestResult {
-  pass,
-  failWithNotAnswered,
-  failWithIncorrect,
-  failWithFallingPoints,
+  passed,
+  failed,
+  failedWithFallingPoints,
   notAnswered,
 }
 
