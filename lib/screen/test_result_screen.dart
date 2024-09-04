@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gplx/model/test_answer_state.dart';
+import 'package:gplx/widget/answer_item.dart';
+import 'package:gplx/widget/question_answer.dart';
+import 'package:gplx/widget/test_result_item.dart';
 
 import '../model/question.dart';
 import '../model/question_state.dart';
@@ -28,14 +33,18 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
   late final List<QuestionState> questionStates;
   late final int totalQuestion;
   late final List<int> questionId;
+  late final List<List<int>> questionIdPerPage;
+  late final TestResult testResult;
 
   var isShowCustomTopSheet = false;
 
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
+  late AnimationController _resultItemController;
+  late Animation<Offset> _resultItemSlideAnimation;
 
-  final tabsContent = [
+  final tabHeaders = [
     'Tất cả',
     'Câu đúng',
     'Câu sai',
@@ -66,6 +75,32 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
       curve: Curves.easeInOut,
     ));
 
+    _resultItemController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _resultItemSlideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, -1),
+    ).animate(CurvedAnimation(
+      parent: _resultItemController,
+      curve: Curves.easeInOut,
+    ));
+
+    _tabController = TabController(length: tabHeaders.length, vsync: this);
+
+    _scrollController.addListener(() {
+      final offset = _scrollController.offset;
+      if (offset <= 50) {
+        // Hiện TestResultItem
+        _resultItemController.reverse();
+      } else if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+        // Kéo lên - Ẩn TestResultItem
+        _resultItemController.forward();
+      }
+    });
+
     allQuestions = ref.read(questionProvider);
     questionId = ref
         .read(testProvider)
@@ -76,9 +111,35 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
         .firstWhere((test) => test.id == widget.testId)
         .testAnswerState
         .questionStates!;
+    questionIdPerPage = [
+      questionId,
+      [
+        for (final state in questionStates)
+          if (state.answerState == AnswerState.correct)
+            questionId[questionStates.indexOf(state)]
+      ],
+      [
+        for (final state in questionStates)
+          if (state.answerState == AnswerState.wrong)
+            questionId[questionStates.indexOf(state)]
+      ],
+      [
+        for (final state in questionStates)
+          if (state.answerState == AnswerState.notAnswered)
+            questionId[questionStates.indexOf(state)]
+      ],
+    ];
     totalQuestion = questionId.length;
 
-    _tabController = TabController(length: tabsContent.length, vsync: this);
+    testResult = ref
+        .read(testProvider)
+        .firstWhere((test) => test.id == widget.testId)
+        .testAnswerState
+        .result;
+
+    if (testResult != TestResult.passed) {
+      _tabController.animateTo(2);
+    }
   }
 
   @override
@@ -162,102 +223,128 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
 
   @override
   Widget build(BuildContext context) {
-    final testResult =
-        ref.watch(testProvider).firstWhere((test) => test.id == widget.testId);
-
-    Widget content = Center(
-      child: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Center(
+          child: Text(
+            'Kết quả thi',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        actions: [
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 200),
+            crossFadeState: isShowCustomTopSheet
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: IconButton(
+              tooltip: 'Danh sách câu hỏi',
+              style: totalQuestion == 0
+                  ? ButtonStyle(
+                      overlayColor: WidgetStateProperty.all(Colors.transparent),
+                    )
+                  : null,
+              onPressed: () {
+                if (totalQuestion == 0) return;
+                showCustomTopSheet(context);
+              },
+              icon: Icon(Icons.list,
+                  color:
+                      totalQuestion == 0 ? Colors.transparent : Colors.black),
+            ),
+            secondChild: IconButton(
+              tooltip: 'Đóng',
+              onPressed: () {
+                hideCustomTopSheet();
+              },
+              icon: const Icon(Icons.close, color: Colors.black),
+            ),
+          ),
+        ],
+        bottom: TabBar(
+          tabAlignment: TabAlignment.center,
+          controller: _tabController,
+          isScrollable: true,
+          tabs: tabHeaders.map((tab) {
+            return Tab(
+              child: Text(tab),
+            );
+          }).toList(),
+        ),
+      ),
+      body: Stack(
         children: [
-          Text('Test Result Screen, Id: ${widget.testId}'),
-          Text('Test Result: ${testResult.testAnswerState.result}'),
-          Text('Test AnswerState: ${testResult.testAnswerState.toMap()}'),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AnimatedBuilder(
+              animation: _resultItemSlideAnimation,
+              builder: (context, child) {
+                return SlideTransition(
+                  position: _resultItemSlideAnimation,
+                  child: child,
+                );
+              },
+              child: TestResultItem(
+                testResult: testResult,
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: TabBarView(
+              // todo: thử thay bằng PageView xem đỡ lag không
+              controller: _tabController,
+              children: questionIdPerPage.map((tab) {
+                if (tab.isEmpty) {
+                  return const Center(child: Text('Không có câu hỏi'));
+                } else {
+                  return SingleChildScrollView(
+                    controller: _scrollController,
+                        child: Column(
+                        children: [
+                          for (final id in tab) ...[
+                            QuestionAnswer(
+                              key: ValueKey(id),
+                              currentQuestion: allQuestions[id - 1],
+                              currentQuestionIndex: questionId.indexOf(id) + 1,
+                              totalQuestion: totalQuestion,
+                              questionState:
+                                  questionStates[questionId.indexOf(id)],
+                              onStateChanged: (newState) {
+                                setState(() {
+                                  questionStates[questionId.indexOf(id)] =
+                                      newState;
+                                });
+                              },
+                              readOnly: true,
+                            ),
+                            const Divider(thickness: 8),
+                          ]
+                        ],
+                      ));
+                }
+              }).toList(),
+            ),
+          ),
+          // Custom top sheet
+          if (isShowCustomTopSheet) ...[
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: ModalBarrier(
+                color: Colors.black54,
+                dismissible: true,
+                onDismiss: hideCustomTopSheet,
+              ),
+            ),
+            buildCustomTopSheet()
+          ]
         ],
       ),
-    );
-
-    return Scaffold(
-      body: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                title: const Center(
-                  child: Text(
-                    'Kết quả thi',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                pinned: true,
-                floating: true,
-                snap: true,
-                actions: [
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 200),
-                    crossFadeState: isShowCustomTopSheet
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    firstChild: IconButton(
-                      tooltip: 'Danh sách câu hỏi',
-                      style: totalQuestion == 0
-                          ? ButtonStyle(
-                              overlayColor:
-                                  WidgetStateProperty.all(Colors.transparent),
-                            )
-                          : null,
-                      onPressed: () {
-                        if (totalQuestion == 0) return;
-                        showCustomTopSheet(context);
-                      },
-                      icon: Icon(Icons.list,
-                          color: totalQuestion == 0
-                              ? Colors.transparent
-                              : Colors.black),
-                    ),
-                    secondChild: IconButton(
-                      tooltip: 'Đóng',
-                      onPressed: () {
-                        hideCustomTopSheet();
-                      },
-                      icon: const Icon(Icons.close, color: Colors.black),
-                    ),
-                  ),
-                ],
-                bottom: TabBar(
-                  tabAlignment: TabAlignment.start,
-                  controller: _tabController,
-                  isScrollable: true,
-                  tabs: tabsContent.map((tab) {
-                    return Tab(
-                      child: Text(tab),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ];
-          },
-          body: Stack(
-            children: [
-              TabBarView(
-                controller: _tabController,
-                children: tabsContent.map((_) => content).toList(),
-              ),
-              // Custom top sheet
-              if (isShowCustomTopSheet) ...[
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ModalBarrier(
-                    color: Colors.black54,
-                    dismissible: true,
-                    onDismiss: hideCustomTopSheet,
-                  ),
-                ),
-                buildCustomTopSheet()
-              ]
-            ],
-          )),
     );
   }
 }

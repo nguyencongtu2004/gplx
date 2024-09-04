@@ -276,6 +276,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                       children: [
                         for (final id in questionId)
                           QuestionAnswer(
+                            padding: EdgeInsets.only(bottom: isQuestionListVisible ? 100 + 50 + 16 : 50 + 16),
                             key: ValueKey(id),
                             currentQuestion: allQuestions[id - 1],
                             currentQuestionIndex: questionId.indexOf(id) + 1,
@@ -314,14 +315,23 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                 left: 0,
                 right: 0,
                 child: Container(
-                  color: const Color(0xFFBDFFE7),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFBDFFE7),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      topRight: Radius.circular(8),
+                    ),
+                  ),
                   child: Column(
                     children: [
                       if (isQuestionListVisible)
-                        QuestionListToTest(
-                          onQuestionSelected: onQuestionSelected,
-                          questionStatuses:
-                              questionStates.map((e) => e.answerState).toList(),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: QuestionListToTest(
+                            onQuestionSelected: onQuestionSelected,
+                            questionStatuses:
+                                questionStates.map((e) => e.answerState).toList(),
+                          ),
                         ),
                       Container(
                         color: const Color(0xFFBDFFE7),

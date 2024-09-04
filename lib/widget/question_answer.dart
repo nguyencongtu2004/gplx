@@ -22,6 +22,8 @@ class QuestionAnswer extends ConsumerStatefulWidget {
     required this.currentQuestionIndex,
     required this.questionState,
     required this.onStateChanged,
+    this.readOnly = false,
+    this.padding = const EdgeInsets.all(0),
   });
 
   final Question currentQuestion;
@@ -29,6 +31,8 @@ class QuestionAnswer extends ConsumerStatefulWidget {
   final int currentQuestionIndex;
   final QuestionState questionState;
   final ValueChanged<QuestionState> onStateChanged;
+  final bool readOnly;
+  final EdgeInsets padding;
 
   @override
   ConsumerState<QuestionAnswer> createState() => _QuestionAnswerState();
@@ -70,7 +74,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
   }
 
   Future<void> onAnswer(int answeredIndex) async {
-    if (_currentState.answerState != AnswerState.notAnswered) {
+    if (_currentState.answerState != AnswerState.notAnswered || widget.readOnly) {
       return;
     }
     final isCorrect = answeredIndex == widget.currentQuestion.correctAnswer - 1;
@@ -127,123 +131,102 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      if (currentQuestion.isFailingPoint) ...[
-                        const Icon(Icons.thunderstorm, color: Colors.red),
-                        const SizedBox(width: 4)
-                      ],
-                      Text('Câu $currentQuestionIndex/$totalQuestion',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 12,
-                          )),
-                      if (currentQuestion.questionStatus ==
-                          QuestionStatus.correct) ...[
-                        const SizedBox(width: 4),
-                        const Icon(Icons.check, color: Colors.green),
-                      ] else if (currentQuestion.questionStatus ==
-                          QuestionStatus.wrong) ...[
-                        const SizedBox(width: 4),
-                        const Icon(Icons.close, color: Colors.red),
-                      ],
-                    ],
-                  ),
-                ),
-                IconButton(
-                    onPressed: onSaved,
-                    tooltip: _currentState.isSaved
-                        ? 'Bỏ lưu câu hỏi'
-                        : 'Lưu câu hỏi',
-                    icon: Icon(
-                      _currentState.isSaved
-                          ? Icons.bookmark
-                          : Icons.bookmark_outline,
-                      color:
-                          _currentState.isSaved ? Colors.green : Colors.black,
-                    )),
-              ],
-            ),
-          ),
-          // Câu hỏi
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              currentQuestion.question,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          if (currentQuestion.image.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Divider(),
-            )
-          else
+      child: Padding(
+        padding: widget.padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.asset(
-                'assets/data/images_of_question/${currentQuestion.id}.png',
-                width: double.infinity,
-                fit: BoxFit.cover,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        if (currentQuestion.isFailingPoint) ...[
+                          const Icon(Icons.thunderstorm, color: Colors.red),
+                          const SizedBox(width: 4)
+                        ],
+                        Text('Câu $currentQuestionIndex/$totalQuestion',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                            )),
+                        if (currentQuestion.questionStatus ==
+                            QuestionStatus.correct) ...[
+                          const SizedBox(width: 4),
+                          const Icon(Icons.check, color: Colors.green),
+                        ] else if (currentQuestion.questionStatus ==
+                            QuestionStatus.wrong) ...[
+                          const SizedBox(width: 4),
+                          const Icon(Icons.close, color: Colors.red),
+                        ],
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: onSaved,
+                      tooltip: _currentState.isSaved
+                          ? 'Bỏ lưu câu hỏi'
+                          : 'Lưu câu hỏi',
+                      icon: Icon(
+                        _currentState.isSaved
+                            ? Icons.bookmark
+                            : Icons.bookmark_outline,
+                        color:
+                            _currentState.isSaved ? Colors.green : Colors.black,
+                      )),
+                ],
               ),
             ),
-          // Câu trả lời
-          Column(
-            children: currentQuestion.answers.map((answer) {
-              final answeredIndex = currentQuestion.answers.indexOf(answer);
-              return AnswerItem(
-                  answer: '${answeredIndex + 1}- $answer',
-                  answerState: getAnswerState(answeredIndex),
-                  onTap: () {
-                    onAnswer(answeredIndex);
-                  });
-            }).toList(),
-          ),
-          // Giải thích
-          if (_currentState.answerState != AnswerState.notAnswered)
+            // Câu hỏi
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                currentQuestion.question,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            if (currentQuestion.image.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Divider(),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  'assets/data/images_of_question/${currentQuestion.id}.png',
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            // Câu trả lời
             Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text(
-                      'Kết quả',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  // Giải thích
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: ExplanationItem(
-                      answerState: _currentState.answerState,
-                      explanation: currentQuestion.explanation,
-                      correctAnswer: currentQuestion.correctAnswer,
-                    ),
-                  ),
-                  if (currentQuestion.signId.isNotEmpty) ...[
+              children: currentQuestion.answers.map((answer) {
+                final answeredIndex = currentQuestion.answers.indexOf(answer);
+                return AnswerItem(
+                    answer: '${answeredIndex + 1}- $answer',
+                    answerState: getAnswerState(answeredIndex),
+                    onTap: () {
+                      onAnswer(answeredIndex);
+                    });
+              }).toList(),
+            ),
+            // Giải thích
+            if (_currentState.answerState != AnswerState.notAnswered)
+              Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const SizedBox(height: 16),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
-                        'Tra cứu biển báo',
+                        'Kết quả',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -251,21 +234,44 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                         ),
                       ),
                     ),
-                    // Tra cứu biển báo
-                    Column(
-                      children: [
-                        for (final sign in signs)
-                          SignItem(
-                              sign: sign,
-                              size: 90,
-                              onTap: () => SignsScreen.onSignTap(context, sign,
-                                  isVibration: isVibration)),
-                      ],
+                    // Giải thích
+                    Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: ExplanationItem(
+                        answerState: _currentState.answerState,
+                        explanation: currentQuestion.explanation,
+                        correctAnswer: currentQuestion.correctAnswer,
+                      ),
                     ),
-                  ],
-                ].animate(interval: 50.ms).fadeIn(duration: 200.ms)),
-          const SizedBox(height: 50 + 16),
-        ],
+                    if (currentQuestion.signId.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          'Tra cứu biển báo',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      // Tra cứu biển báo
+                      Column(
+                        children: [
+                          for (final sign in signs)
+                            SignItem(
+                                sign: sign,
+                                size: 90,
+                                onTap: () => SignsScreen.onSignTap(context, sign,
+                                    isVibration: isVibration)),
+                        ],
+                      ),
+                    ],
+                  ].animate(interval: 50.ms).fadeIn(duration: 200.ms)),
+          ],
+        ),
       ),
     );
   }

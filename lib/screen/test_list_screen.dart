@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gplx/model/test_answer_state.dart';
 
 import '../provider/license_class_provider.dart';
+import '../provider/tests_provider.dart';
 
 class TestListScreen extends ConsumerWidget {
   const TestListScreen({super.key});
 
-  Widget _buildTestItem({required Center child, required void Function() onTap}) {
+  Widget _buildTestItem(
+      {required Center child, required void Function() onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -30,7 +33,24 @@ class TestListScreen extends ConsumerWidget {
 
   void onTestClick(BuildContext context, WidgetRef ref, int index) {
     print('Test $index');
-    context.push('/test-info/${index + 1}');
+    final String licenseClass = ref.read(licenseClassProvider);
+    final testId = ref
+        .read(testProvider)
+        .firstWhere((test) =>
+            test.testNumber == index + 1 && test.licenseClass == licenseClass)
+        .id;
+    final isAnswered = ref
+            .read(testProvider)
+            .firstWhere((test) => test.id == testId)
+            .testAnswerState
+            .result !=
+        TestResult.notAnswered;
+    if (isAnswered) {
+      context.push('/test-result/$testId');
+    } else {
+      // todo: thay vì push thì sẽ hiển thị trong đây luôn
+      context.push('/test-info/${index + 1}');
+    }
   }
 
   @override

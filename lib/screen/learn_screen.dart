@@ -272,6 +272,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                   children: [
                     for (final id in questionId)
                       QuestionAnswer(
+                        padding: const EdgeInsets.only(bottom: 50 + 16),
                           key: ValueKey(id),
                           currentQuestion: allQuestions[id - 1],
                           currentQuestionIndex: questionId.indexOf(id) + 1,
