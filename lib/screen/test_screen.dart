@@ -9,6 +9,7 @@ import 'package:gplx/widget/time_bar.dart';
 
 import '../model/question.dart';
 import '../model/question_state.dart';
+import '../provider/license_class_provider.dart';
 import '../provider/question_provider.dart';
 import '../widget/answer_item.dart';
 import '../widget/question_answer.dart';
@@ -17,12 +18,10 @@ import '../widget/question_list_to_test.dart';
 class TestScreen extends ConsumerStatefulWidget {
   const TestScreen({
     super.key,
-    required this.licenseClass,
-    required this.testNumber,
+    required this.testId
   });
 
-  final String licenseClass;
-  final int testNumber;
+  final String testId;
 
   @override
   ConsumerState<TestScreen> createState() => _TestScreenState();
@@ -36,6 +35,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   late final int totalQuestion;
   late final List<int> questionId;
 
+  late String licenseClass;
   late String testId;
   late int totalTime; // 30 minutes = 1800 seconds
   late int timeLeft;
@@ -44,35 +44,33 @@ class _TestScreenState extends ConsumerState<TestScreen> {
   var isQuestionListVisible = true;
   var isShowPreviousButton = false;
   var isShowNextButton = true;
+  var selectingPage = 0;
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
+    licenseClass = ref.read(licenseClassProvider);
     allQuestions = ref.read(questionProvider);
     questionId = ref
         .read(testProvider)
-        .firstWhere((test) =>
-            test.testNumber == widget.testNumber &&
-            test.licenseClass == widget.licenseClass)
+        .firstWhere((test) => test.id == widget.testId)
         .questions;
 
     questionStates = List.generate(
         questionId.length,
         (index) => QuestionState(
             isSaved: allQuestions[questionId[index] - 1].isSaved,
-            answerState: AnswerState.notAnswered));
+            answerState: AnswerState.none));
     totalQuestion = questionId.length;
     notAnswered = totalQuestion;
     testId = ref
         .read(testProvider)
-        .firstWhere((test) =>
-            test.testNumber == widget.testNumber &&
-            test.licenseClass == widget.licenseClass)
+        .firstWhere((test) => test.id == widget.testId)
         .id;
     totalTime = ref
             .read(testProvider.notifier)
-            .getTestInformation(widget.licenseClass)
+            .getTestInformation(licenseClass)
             .timeLimit *
         60;
     timeLeft = totalTime;
@@ -195,7 +193,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
         .length;
 
     final testInfo =
-        ref.read(testProvider.notifier).getTestInformation(widget.licenseClass);
+        ref.read(testProvider.notifier).getTestInformation(licenseClass);
     final failingPointQuestionIds =
         ref.read(testProvider.notifier).getFailingPointQuestionIds();
     TestResult result;
@@ -289,7 +287,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                                     newState;
                                 // Update notAnswered
                                 if (newState.answerState ==
-                                    AnswerState.notAnswered) {
+                                    AnswerState.none) {
                                   notAnswered++;
                                 } else {
                                   notAnswered--;
@@ -303,6 +301,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                         setState(() {
                           isShowPreviousButton = index != 0;
                           isShowNextButton = index != totalQuestion - 1;
+                          selectingPage = index;
                         });
                       },
                     ),
@@ -328,6 +327,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: QuestionListToTest(
+                            selectingPage: selectingPage,
                             onQuestionSelected: onQuestionSelected,
                             questionStatuses:
                                 questionStates.map((e) => e.answerState).toList(),

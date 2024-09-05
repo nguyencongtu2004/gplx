@@ -49,7 +49,7 @@ class TestListScreen extends ConsumerWidget {
       context.push('/test-result/$testId');
     } else {
       // todo: thay vì push thì sẽ hiển thị trong đây luôn
-      context.push('/test-info/${index + 1}');
+      context.push('/test-info/$testId');
     }
   }
 

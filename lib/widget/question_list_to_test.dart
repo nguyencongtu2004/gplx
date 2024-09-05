@@ -6,34 +6,35 @@ class QuestionListToTest extends StatelessWidget {
     super.key,
     required this.questionStatuses,
     required this.onQuestionSelected,
+    required this.selectingPage,
   });
 
   final List<AnswerState> questionStatuses;
   final void Function(int) onQuestionSelected;
+  final int selectingPage;
 
   Widget _buildAnswerTile(AnswerState answerState, int index) {
+    final isSelecting = selectingPage == index;
     final String text = (index + 1).toString();
-    final Color color;
-    switch (answerState) {
-      case AnswerState.notAnswered:
-        color = Colors.transparent;
-        break;
-      case AnswerState.answered:
-        color = Colors.blue;
-        break;
-      case AnswerState.correct:
-        color = const Color(0x5900DB57);
-        break;
-      case AnswerState.wrong:
-        color = const Color(0x8CFF1D1D);
-        break;
-    }
+    Color backgroundColor = switch(answerState) {
+      AnswerState.none => Colors.transparent,
+      AnswerState.answered => Colors.blue,
+      AnswerState.correct => const Color(0x5900DB57),
+      AnswerState.wrong => const Color(0x8CFF1D1D),
+      AnswerState.notAnswered => Colors.transparent,
+    };
+
     return InkWell(
       onTap: () => onQuestionSelected(index),
       child: Container(
         decoration: BoxDecoration(
-          color: color,
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: isSelecting ? Colors.blue : Colors.transparent,
+            width: 2,
+            strokeAlign: BorderSide.strokeAlignCenter,
+          ),
         ),
         padding: const EdgeInsets.all(4),
         width: 28,

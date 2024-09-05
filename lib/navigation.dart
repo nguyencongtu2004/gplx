@@ -121,17 +121,16 @@ final GoRouter router = GoRouter(
           return const TestListScreen();
         }),
     GoRoute(
-        path: '/test-info/:testNumber',
+        path: '/test-info/:testId',
         builder: (context, state) {
-          final testNumber = int.parse(state.pathParameters['testNumber']!);
-          return TestInfoScreen(testNumber: testNumber);
+          final testId = state.pathParameters['testId']!;
+          return TestInfoScreen(testId: testId);
         }),
     GoRoute(
-        path: '/test/:licenseClass/:testNumber',
+        path: '/test/:testId',
         builder: (context, state) {
-          final licenseClass = state.pathParameters['licenseClass']!;
-          final testNumber = int.parse(state.pathParameters['testNumber']!);
-          return TestScreen(licenseClass: licenseClass, testNumber: testNumber);
+          final testId = state.pathParameters['testId']!;
+          return TestScreen(testId: testId);
         }),
     GoRoute(
         path: '/test-result/:testId',

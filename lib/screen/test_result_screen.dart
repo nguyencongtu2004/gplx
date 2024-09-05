@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gplx/model/test_answer_state.dart';
 import 'package:gplx/widget/answer_item.dart';
 import 'package:gplx/widget/question_answer.dart';
@@ -95,7 +96,8 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
       if (offset <= 50) {
         // Hiện TestResultItem
         _resultItemController.reverse();
-      } else if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+      } else if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
         // Kéo lên - Ẩn TestResultItem
         _resultItemController.forward();
       }
@@ -125,7 +127,7 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
       ],
       [
         for (final state in questionStates)
-          if (state.answerState == AnswerState.notAnswered)
+          if (state.answerState == AnswerState.none)
             questionId[questionStates.indexOf(state)]
       ],
     ];
@@ -278,55 +280,86 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
       ),
       body: Stack(
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: AnimatedBuilder(
-              animation: _resultItemSlideAnimation,
-              builder: (context, child) {
-                return SlideTransition(
-                  position: _resultItemSlideAnimation,
-                  child: child,
-                );
-              },
-              child: TestResultItem(
-                testResult: testResult,
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: TabBarView(
-              // todo: thử thay bằng PageView xem đỡ lag không
+          NestedScrollView(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverToBoxAdapter(
+                  child: Container(
+                    height: 180,
+                    width: double.infinity,
+                    color: Colors.red,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 16,
+                          child: TestResultItem(
+                            testResult: testResult,
+                            onTestAgain: () {
+                              context.push('/test-info/${widget.testId}');
+                            },
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ];
+            },
+            body: TabBarView(
               controller: _tabController,
               children: questionIdPerPage.map((tab) {
                 if (tab.isEmpty) {
                   return const Center(child: Text('Không có câu hỏi'));
                 } else {
-                  return SingleChildScrollView(
-                    controller: _scrollController,
-                        child: Column(
+                  return ListView.builder(
+                    itemCount: tab.length,
+                    itemBuilder: (context, index) {
+                      final id = tab[index];
+                      return Column(
                         children: [
-                          for (final id in tab) ...[
-                            QuestionAnswer(
-                              key: ValueKey(id),
-                              currentQuestion: allQuestions[id - 1],
-                              currentQuestionIndex: questionId.indexOf(id) + 1,
-                              totalQuestion: totalQuestion,
-                              questionState:
-                                  questionStates[questionId.indexOf(id)],
-                              onStateChanged: (newState) {
-                                setState(() {
-                                  questionStates[questionId.indexOf(id)] =
-                                      newState;
-                                });
-                              },
-                              readOnly: true,
-                            ),
-                            const Divider(thickness: 8),
-                          ]
+                          QuestionAnswer(
+                            key: ValueKey(id),
+                            currentQuestion: allQuestions[id - 1],
+                            currentQuestionIndex: questionId.indexOf(id) + 1,
+                            totalQuestion: totalQuestion,
+                            questionState:
+                                questionStates[questionId.indexOf(id)],
+                            onStateChanged: (newState) {
+                              setState(() {
+                                questionStates[questionId.indexOf(id)] =
+                                    newState;
+                              });
+                            },
+                            readOnly: true,
+                            isShowNotAnswered: true,
+                          ),
+                          if (id != tab.last)
+                            const Divider(thickness: 8)
+                          else
+                            const SizedBox(height: 16),
                         ],
-                      ));
+                      );
+                    },
+                  );
                 }
               }).toList(),
             ),
@@ -341,8 +374,8 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
                 onDismiss: hideCustomTopSheet,
               ),
             ),
-            buildCustomTopSheet()
-          ]
+            buildCustomTopSheet(),
+          ],
         ],
       ),
     );

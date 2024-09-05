@@ -96,16 +96,27 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
             .map((e) => e.id)
             .toList();
         break;
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+        questionId = allQuestions
+            .where((question) => question.chapter == widget.chapter)
+            .map((e) => e.id)
+            .toList();
+        break;
       default:
-        throw UnimplementedError(
-            'Chapter ${widget.chapter} is not implemented');
+        throw Exception('Chương ${widget.chapter} không hợp lệ');
     }
 
     questionStates = List.generate(
         questionId.length,
         (index) => QuestionState(
             isSaved: allQuestions[questionId[index] - 1].isSaved,
-            answerState: AnswerState.notAnswered));
+            answerState: AnswerState.none));
     totalQuestion = questionId.length;
   }
 
@@ -272,7 +283,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
                   children: [
                     for (final id in questionId)
                       QuestionAnswer(
-                        padding: const EdgeInsets.only(bottom: 50 + 16),
+                          padding: const EdgeInsets.only(bottom: 50 + 16),
                           key: ValueKey(id),
                           currentQuestion: allQuestions[id - 1],
                           currentQuestionIndex: questionId.indexOf(id) + 1,

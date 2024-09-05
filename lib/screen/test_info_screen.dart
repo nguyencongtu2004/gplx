@@ -9,14 +9,14 @@ import '../provider/license_class_provider.dart';
 class TestInfoScreen extends ConsumerWidget {
   const TestInfoScreen({
     super.key,
-    required this.testNumber,
+    required this.testId,
   });
+  final String testId;
 
-  final int testNumber;
+  int testNumber(WidgetRef ref) => ref.read(testProvider).firstWhere((test) => test.id == testId).testNumber;
 
-  void onTestClick(BuildContext context, WidgetRef ref) {
-    final licenseClass = ref.read(licenseClassProvider);
-    context.pushReplacement('/test/$licenseClass/$testNumber');
+  void onTestClick(BuildContext context) {
+    context.pushReplacement('/test/$testId');
   }
 
   @override
@@ -42,7 +42,7 @@ class TestInfoScreen extends ConsumerWidget {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton(
-          onPressed: () => onTestClick(context, ref),
+          onPressed: () => onTestClick(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue,
             minimumSize: const Size(double.infinity, 50),
@@ -63,7 +63,7 @@ class TestInfoScreen extends ConsumerWidget {
                   ),
                   textAlign: TextAlign.center),
             ),
-            Text('Bài thi số $testNumber',
+            Text('Bài thi số ${testNumber(ref)}',
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.grey,

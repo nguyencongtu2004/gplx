@@ -24,6 +24,7 @@ class QuestionAnswer extends ConsumerStatefulWidget {
     required this.onStateChanged,
     this.readOnly = false,
     this.padding = const EdgeInsets.all(0),
+    this.isShowNotAnswered = false,
   });
 
   final Question currentQuestion;
@@ -33,6 +34,7 @@ class QuestionAnswer extends ConsumerStatefulWidget {
   final ValueChanged<QuestionState> onStateChanged;
   final bool readOnly;
   final EdgeInsets padding;
+  final bool isShowNotAnswered;
 
   @override
   ConsumerState<QuestionAnswer> createState() => _QuestionAnswerState();
@@ -74,7 +76,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
   }
 
   Future<void> onAnswer(int answeredIndex) async {
-    if (_currentState.answerState != AnswerState.notAnswered || widget.readOnly) {
+    if (_currentState.answerState != AnswerState.none || widget.readOnly) {
       return;
     }
     final isCorrect = answeredIndex == widget.currentQuestion.correctAnswer - 1;
@@ -117,16 +119,22 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
     final currentQuestionIndex = widget.currentQuestionIndex;
 
     AnswerState getAnswerState(int index) {
-      if (_currentState.answerState == AnswerState.notAnswered) {
-        return AnswerState.notAnswered;
+      final isCorrectAnswer = index == widget.currentQuestion.correctAnswer - 1;
+      final answerState = _currentState.answerState;
+
+      if (widget.isShowNotAnswered) {
+        if (answerState == AnswerState.notAnswered || answerState == AnswerState.none && isCorrectAnswer) {
+          return AnswerState.notAnswered;
+        }
+        if (isCorrectAnswer) return AnswerState.correct;
+        if (index == _currentState.wrongAnswer) return AnswerState.wrong;
+      } else {
+        if (answerState == AnswerState.none) return AnswerState.none;
+        if (isCorrectAnswer) return AnswerState.correct;
+        if (index == _currentState.wrongAnswer) return AnswerState.wrong;
       }
-      if (index == widget.currentQuestion.correctAnswer - 1) {
-        return AnswerState.correct;
-      }
-      if (index == _currentState.wrongAnswer) {
-        return AnswerState.wrong;
-      }
-      return AnswerState.notAnswered;
+
+      return AnswerState.none;
     }
 
     return SingleChildScrollView(
@@ -140,6 +148,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Row(
                 children: [
+                  // Câu hỏi hiện tại
                   Expanded(
                     child: Row(
                       children: [
@@ -164,6 +173,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                       ],
                     ),
                   ),
+                  //
                   IconButton(
                       onPressed: onSaved,
                       tooltip: _currentState.isSaved
@@ -218,7 +228,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
               }).toList(),
             ),
             // Giải thích
-            if (_currentState.answerState != AnswerState.notAnswered)
+            if (_currentState.answerState != AnswerState.none || widget.isShowNotAnswered)
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

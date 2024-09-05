@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart'; // Import gói animate
 
-enum AnswerState { notAnswered, answered, correct, wrong }
+enum AnswerState { none, notAnswered, answered, correct, wrong }
 
 class AnswerItem extends StatelessWidget {
   const AnswerItem({
@@ -18,28 +18,33 @@ class AnswerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Xác định màu nền dựa vào trạng thái câu trả lời
-    final Color backgroundColor = answerState == AnswerState.notAnswered
-        ? Colors.transparent
-        : answerState == AnswerState.correct
-        ? const Color(0x5900DB57)
-        : const Color(0x8CFF1D1D);
+    final Color backgroundColor = switch (answerState) {
+      AnswerState.none => Colors.transparent,
+      AnswerState.correct => const Color(0x5900DB57),
+      AnswerState.wrong => const Color(0x8CFF1D1D),
+      AnswerState.notAnswered => const Color(0x59FFD94C),
+      AnswerState.answered => Colors.transparent,
+    };
 
     return InkWell(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: 300.ms, // Thời gian của hiệu ứng
-        curve: Curves.easeInOut, // Đường cong chuyển động
+        duration: 300.ms,
+        // Thời gian của hiệu ứng
+        curve: Curves.easeInOut,
+        // Đường cong chuyển động
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        color: backgroundColor, // Màu nền có hiệu ứng animate
+        color: backgroundColor,
+        // Màu nền có hiệu ứng animate
         child: Row(
           children: [
             Icon(
-              answerState == AnswerState.notAnswered
+              answerState == AnswerState.none
                   ? Icons.circle_outlined
                   : answerState == AnswerState.correct
                   ? Icons.check_circle
                   : Icons.cancel,
-              color: answerState == AnswerState.notAnswered
+              color: answerState == AnswerState.none
                   ? Colors.black
                   : Colors.white,
             ),
