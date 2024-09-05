@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gplx/provider/license_class_provider.dart';
+import 'package:lottie/lottie.dart';
 
 import '../provider/question_provider.dart';
 import '../provider/settings_provider.dart';
@@ -69,9 +70,30 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: Text('Loading...'),
+        child: SizedBox(
+          height: 200,
+          child: Stack(
+            children: [
+              LottieBuilder.asset(
+                'assets/animations/car_running.json',
+                repeat: true,
+                fit: BoxFit.cover,
+                height: 200,
+              ),
+              const Positioned(
+                  bottom: 30,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                      child: Text('Chào mừng',
+                          style: TextStyle(
+                            fontSize: 18,
+                          )))),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -45,6 +45,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   riverpod_annotation: ^2.3.5
   flutter_animate: ^4.5.0
+  lottie: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -86,6 +87,9 @@ flutter:
 
     # images of sign
     - assets/data/images_of_sign/
+
+    # lottie animations
+    - assets/animations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

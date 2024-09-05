@@ -1,51 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:gplx/model/test_answer_state.dart';
+import 'package:lottie/lottie.dart';
 
 class TestResultItem extends StatelessWidget {
   const TestResultItem({
     super.key,
     required this.testResult,
     required this.onTestAgain,
+    required this.correctCount,
+    required this.wrongCount,
+    required this.notAnsweredCount,
   });
 
   final TestResult testResult;
   final void Function() onTestAgain;
-
-  Widget buildTestPassed() {
-    return Text('Chúc mừng bạn đã vượt qua bài thi');
-  }
-
-  Widget buildTestFailed() {
-    return Text('Rất tiếc, bạn đã không vượt qua bài thi');
-  }
-
-  Widget buildTestFailedWithFallingPoints() {
-    return Text('Rất tiếc, bạn đã không vượt qua bài thi');
-  }
+  final int correctCount;
+  final int wrongCount;
+  final int notAnsweredCount;
 
   @override
   Widget build(BuildContext context) {
-    final Widget content;
+    final String assetPath;
+    final String message;
     switch (testResult) {
       case TestResult.passed:
-        content = buildTestPassed();
+        assetPath = 'assets/animations/pass.json';
+        message = 'Chúc mừng! Bạn đã thi đạt';
       case TestResult.failed:
-        content = buildTestFailed();
+        assetPath = 'assets/animations/fail2.json';
+        message = 'Bạn đã thi trượt';
       case TestResult.failedWithFallingPoints:
-        content = buildTestFailedWithFallingPoints();
+        assetPath = 'assets/animations/fail2.json';
+        message = 'Bạn đã thi trượt vì câu điểm liệt';
       default:
-        throw Exception('Kêt quả không hợp lệ');
+        throw Exception('Kết quả không hợp lệ');
     }
 
-    return Center(child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        content,
-        ElevatedButton(
-          onPressed: onTestAgain,
-          child: const Text('Thi lại'),
-        ),
-      ],
-    ));
+    return Center(
+      child: Row(
+        children: [
+          LottieBuilder.asset(
+            assetPath,
+            filterQuality: FilterQuality.high,
+            frameRate: FrameRate.max,
+            fit: BoxFit.cover,
+            height: 100,
+            repeat: false,
+          ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(message),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        Icon(Icons.check),
+                        Text('$correctCount'),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Icon(Icons.close),
+                        Text('$wrongCount'),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Icon(Icons.help),
+                        Text('$notAnsweredCount'),
+                      ],)
+                  ],
+                ),
+                ElevatedButton(
+                  onPressed: onTestAgain,
+                  child: const Text('Thi lại'),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

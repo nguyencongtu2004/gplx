@@ -25,6 +25,7 @@ class QuestionAnswer extends ConsumerStatefulWidget {
     this.readOnly = false,
     this.padding = const EdgeInsets.all(0),
     this.isShowNotAnswered = false,
+    this.isMarkingAfterAnswer = true,
   });
 
   final Question currentQuestion;
@@ -35,6 +36,7 @@ class QuestionAnswer extends ConsumerStatefulWidget {
   final bool readOnly;
   final EdgeInsets padding;
   final bool isShowNotAnswered;
+  final bool isMarkingAfterAnswer;
 
   @override
   ConsumerState<QuestionAnswer> createState() => _QuestionAnswerState();
@@ -273,7 +275,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                           for (final sign in signs)
                             SignItem(
                                 sign: sign,
-                                size: 90,
+                                imageSize: 90,
                                 onTap: () => SignsScreen.onSignTap(context, sign,
                                     isVibration: isVibration)),
                         ],

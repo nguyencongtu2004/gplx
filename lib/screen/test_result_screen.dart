@@ -29,6 +29,10 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
     with TickerProviderStateMixin {
   late final TabController _tabController;
   final _scrollController = ScrollController();
+  final _topSheetScrollController = ScrollController();
+
+  // Tạo danh sách các GlobalKey cho mỗi câu hỏi
+  final List<GlobalKey> _questionKeys = [];
 
   late final List<Question> allQuestions;
   late final List<QuestionState> questionStates;
@@ -42,8 +46,6 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
-  late AnimationController _resultItemController;
-  late Animation<Offset> _resultItemSlideAnimation;
 
   final tabHeaders = [
     'Tất cả',
@@ -76,32 +78,7 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
       curve: Curves.easeInOut,
     ));
 
-    _resultItemController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    _resultItemSlideAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: const Offset(0, -1),
-    ).animate(CurvedAnimation(
-      parent: _resultItemController,
-      curve: Curves.easeInOut,
-    ));
-
     _tabController = TabController(length: tabHeaders.length, vsync: this);
-
-    _scrollController.addListener(() {
-      final offset = _scrollController.offset;
-      if (offset <= 50) {
-        // Hiện TestResultItem
-        _resultItemController.reverse();
-      } else if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.reverse) {
-        // Kéo lên - Ẩn TestResultItem
-        _resultItemController.forward();
-      }
-    });
 
     allQuestions = ref.read(questionProvider);
     questionId = ref
@@ -142,17 +119,42 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
     if (testResult != TestResult.passed) {
       _tabController.animateTo(2);
     }
+
+    // Khởi tạo danh sách các GlobalKey
+    _questionKeys.addAll(List.generate(totalQuestion, (index) => GlobalKey()));
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     _scrollController.dispose();
+    _topSheetScrollController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
+  void onQuestionChange(int index) {
+    final key = _questionKeys[index];
+    final context = key.currentContext;
+    print('context: $context');
+    if (context != null) {
+      // Tìm vị trí của item trong ListView
+      final box = context.findRenderObject() as RenderBox;
+      final position = box.localToGlobal(Offset.zero);
+      final offsetToScroll = _scrollController.offset + position.dy - kToolbarHeight - 180;
+
+      print('offsetToScroll: $offsetToScroll');
+      _scrollController.animateTo(
+        offsetToScroll,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+
   Widget buildCustomTopSheet() {
+    final selectingPage = _tabController.index;
     return SlideTransition(
       position: _slideAnimation,
       child: Container(
@@ -165,9 +167,9 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
           ),
         ),
         child: ListView(
-          controller: _scrollController,
+          controller: _topSheetScrollController,
           children: [
-            for (final id in questionId)
+            for (final id in questionIdPerPage[selectingPage])
               Column(
                 children: [
                   QuestionItem(
@@ -177,8 +179,8 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
                     isSelecting: false,
                     // todo: fix khi chọn câu hỏi từ danh sách
                     onTap: () {
-                      // todo: chuyển câu hỏi khi chọn từ danh sách
-                      //onQuestionChange(questionId.indexOf(id));
+                      // todo: fix chuyển câu hỏi khi chọn từ danh sách
+                      onQuestionChange(questionId.indexOf(id));
                       hideCustomTopSheet();
                     },
                   ),
@@ -276,11 +278,14 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
               child: Text(tab),
             );
           }).toList(),
+          onTap: (index) {setState(() {});
+          },
         ),
       ),
       body: Stack(
         children: [
           NestedScrollView(
+            controller: _scrollController,
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {
               return <Widget>[
@@ -288,7 +293,12 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
                   child: Container(
                     height: 180,
                     width: double.infinity,
-                    color: Colors.red,
+                    decoration: BoxDecoration(
+                      color: testResult == TestResult.passed
+                          ? Colors.greenAccent
+                          : const Color(0xFFFF738D),
+
+                    ),
                     child: Stack(
                       children: [
                         Positioned(
@@ -298,6 +308,15 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
                           bottom: 16,
                           child: TestResultItem(
                             testResult: testResult,
+                            correctCount: questionStates
+                                .where((state) => state.answerState == AnswerState.correct)
+                                .length,
+                            wrongCount: questionStates
+                                .where((state) => state.answerState == AnswerState.wrong)
+                                .length,
+                            notAnsweredCount: questionStates
+                                .where((state) => state.answerState == AnswerState.none)
+                                .length,
                             onTestAgain: () {
                               context.push('/test-info/${widget.testId}');
                             },
@@ -331,13 +350,14 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
                   return const Center(child: Text('Không có câu hỏi'));
                 } else {
                   return ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: tab.length,
                     itemBuilder: (context, index) {
                       final id = tab[index];
                       return Column(
                         children: [
                           QuestionAnswer(
-                            key: ValueKey(id),
+                            key: _questionKeys[questionId.indexOf(id)], // Gán GlobalKey cho mỗi item
                             currentQuestion: allQuestions[id - 1],
                             currentQuestionIndex: questionId.indexOf(id) + 1,
                             totalQuestion: totalQuestion,

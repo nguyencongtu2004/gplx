@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gplx/provider/question_provider.dart';
 import 'package:gplx/widget/sign_item.dart';
@@ -233,15 +232,16 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
                   final String categoryImage =
                       _getSignCategoryImage(signs.first.category);
                   return Tab(
-                    child: Row(
+                    height: 70,
+                    child: Column(
                       children: [
                         Image.asset(
                           'assets/data/images_of_sign/$categoryImage.png',
-                          width: 30,
-                          height: 30,
+                          width: 35,
+                          height: 35,
                           fit: BoxFit.scaleDown,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(height: 8),
                         Text(categoryName),
                       ],
                     ),
@@ -255,17 +255,23 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
           controller: _tabController,
           children: signsPerPage.map((signs) {
             // không dùng ListView để nó load trước hình ảnh
-            return SingleChildScrollView(
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 12),
               key: PageStorageKey<SignCategory>(signs.first.category),
-              child: Column(
-                children: signs.map((sign) {
-                  return SignItem(
-                    sign: sign,
-                    size: 120,
-                    onTap: () => SignsScreen.onSignTap(context, sign, isVibration: isVibration),
-                  );
-                }).toList()/*.animate(interval: 100.ms).fadeIn(duration: 200.ms)*/,
-              ),
+              shrinkWrap: true, // Để ListView không chiếm hết không gian
+              physics: const NeverScrollableScrollPhysics(), // Không cho scroll vì có NestedScrollView
+              itemCount: signs.length,
+              itemBuilder: (BuildContext context, int index) {
+                return SignItem(
+                  sign: signs[index],
+                  imageSize: 120,
+                  onTap: () => SignsScreen.onSignTap(
+                    context,
+                    signs[index],
+                    isVibration: isVibration,
+                  ),
+                );
+              },
             );
           }).toList(),
         ),
