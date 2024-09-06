@@ -39,10 +39,8 @@ class CustomCard extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
             color: titleColor,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.center,
           maxLines: 1,
@@ -74,17 +72,14 @@ class CustomCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     title,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: titleColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     description,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       color: descriptionColor,
-                      fontSize: 14,
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,

@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gplx/provider/question_provider.dart';
 import 'package:gplx/widget/information.dart';
+import 'package:vibration/vibration.dart';
 
 import '../provider/license_class_provider.dart';
 import '../provider/settings_provider.dart';
+import '../theme.dart';
 
 class ItemInList {
   final String title;
@@ -76,9 +78,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       leading: Icon(item.icon, color: item.color),
       title: Text(
         item.title,
-        style: TextStyle(
+        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
           fontWeight: FontWeight.bold,
-          color: item.color,
+          color: item.color == Colors.red ? Colors.red : null,
         ),
       ),
       trailing: item.isSwitch
@@ -196,11 +198,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 48),
-            const Text('Thông tin của tôi',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                )),
+            Text('Thông tin của tôi',
+                style: Theme.of(context).textTheme.displaySmall),
             const SizedBox(height: 16),
             // Thông tin cá nhân
             const Information(
@@ -209,15 +208,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               description: 'Đã học được 1 tháng',
             ),
             const SizedBox(height: 24),
-            const Text('Hạng GPLX',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                )),
+            Text('Hạng GPLX',
+                style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: const Color(0x47E4E693),
+                //color: const Color(0x47E4E693),
+                color: isDarkMode
+                    ? MaterialTheme.nenGplx.dark.colorContainer
+                    : MaterialTheme.nenGplx.value,
                 borderRadius: BorderRadius.circular(8),
               ),
               // Hạng GPLX
@@ -226,34 +225,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 leading: const Icon(Icons.star),
                 title: Text(
                   'Hạng ${ref.watch(licenseClassProvider)}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                trailing: const Row(
+                trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text('Thay đổi',
-                        style: TextStyle(
-                          color: Color(0xFF011D26),
-                          fontSize: 16,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
                         )),
-                    SizedBox(width: 4),
-                    Icon(Icons.arrow_forward_ios),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.arrow_forward_ios),
                   ],
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Cài đặt',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                )),
+            Text('Cài đặt',
+                style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             // Cài đặt
             Container(
               decoration: BoxDecoration(
-                color: const Color(0x4793CDE6),
+                // color: const Color(0x4793CDE6),
+                color: isDarkMode
+                    ? MaterialTheme.nenCaiDat.dark.colorContainer
+                    : MaterialTheme.nenCaiDat.value,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -261,16 +261,32 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _buildItemInList(
                     allSettings[0],
                     switchValue: isVibration,
-                    onSwitchChanged: onChangeVibration,
-                    onTap: () {
+                    onSwitchChanged: (_) async {
+                      if (!isVibration && (await Vibration.hasVibrator() ?? false)) {
+                        Vibration.vibrate(duration: 15);
+                      }
+                      onChangeVibration(!isVibration);
+                    },
+                    onTap: () async {
+                      if (!isVibration && (await Vibration.hasVibrator() ?? false)) {
+                        Vibration.vibrate(duration: 15);
+                      }
                       onChangeVibration(!isVibration);
                     },
                   ),
                   _buildItemInList(
                     allSettings[1],
                     switchValue: isDarkMode,
-                    onSwitchChanged: onChangeTheme,
-                    onTap: () {
+                    onSwitchChanged: (_) async {
+                      if (isVibration && (await Vibration.hasVibrator() ?? false)) {
+                        Vibration.vibrate(duration: 15);
+                      }
+                      onChangeTheme(!isDarkMode);
+                    },
+                    onTap: () async {
+                      if (isVibration && (await Vibration.hasVibrator() ?? false)) {
+                        Vibration.vibrate(duration: 15);
+                      }
                       onChangeTheme(!isDarkMode);
                     },
                   ),
@@ -279,16 +295,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Liên hệ và góp ý',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                )),
+            Text('Liên hệ và góp ý',
+                style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             // Liên hệ và góp ý
             Container(
               decoration: BoxDecoration(
-                color: const Color(0x47A6DDB2),
+                // color: const Color(0x47A6DDB2),
+                color: isDarkMode
+                    ? MaterialTheme.nenLienHe.dark.colorContainer
+                    : MaterialTheme.nenLienHe.value,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(

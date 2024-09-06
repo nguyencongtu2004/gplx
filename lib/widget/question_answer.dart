@@ -159,9 +159,8 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                           const SizedBox(width: 4)
                         ],
                         Text('Câu $currentQuestionIndex/$totalQuestion',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 12,
+                            style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                              fontWeight: FontWeight.normal,
                             )),
                         if (currentQuestion.questionStatus ==
                             QuestionStatus.correct) ...[
@@ -186,7 +185,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                             ? Icons.bookmark
                             : Icons.bookmark_outline,
                         color:
-                            _currentState.isSaved ? Colors.green : Colors.black,
+                            _currentState.isSaved ? Colors.green : null,
                       )),
                 ],
               ),
@@ -196,11 +195,7 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text(
                 currentQuestion.question,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ),
             if (currentQuestion.image.isEmpty)
@@ -235,15 +230,11 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
                         'Kết quả',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
                     // Giải thích
@@ -258,15 +249,11 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                     ),
                     if (currentQuestion.signId.isNotEmpty) ...[
                       const SizedBox(height: 16),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Text(
                           'Tra cứu biển báo',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
                       // Tra cứu biển báo

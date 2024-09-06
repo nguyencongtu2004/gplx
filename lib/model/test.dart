@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:gplx/model/question_state.dart';
 import 'package:gplx/model/test_answer_state.dart';
-import 'package:gplx/widget/answer_item.dart';
 
 class Test {
   Test({

@@ -25,6 +25,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   Future<void> _loadData() async {
     try {
+      // Tải dữ liệu cài đặt và hạng giấy phép lái xe
+      await ref.read(settingsProvider.notifier).loadSettings();
+      await ref.read(licenseClassProvider.notifier).loadLicenseClass();
+      print('Dữ liệu cài đặt đã được tải');
+    } catch (e) {
+      print('Lỗi load cài đặt: $e');
+      // Có thể hiển thị một thông báo lỗi hoặc thử tải lại dữ liệu
+    }
+
+    try {
       await ref.read(questionProvider.notifier).loadQuestions();
       if (ref.read(questionProvider).isEmpty) {
         print('Không có dữ liệu câu hỏi');
@@ -49,27 +59,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     }
 
     try {
-      // Tải dữ liệu cài đặt và hạng giấy phép lái xe
-      await ref.read(settingsProvider.notifier).loadSettings();
-      await ref.read(licenseClassProvider.notifier).loadLicenseClass();
-      print('Dữ liệu cài đặt đã được tải');
-    } catch (e) {
-      print('Lỗi load cài đặt: $e');
-      // Có thể hiển thị một thông báo lỗi hoặc thử tải lại dữ liệu
-    }
-
-    try {
       await ref.read(testProvider.notifier).loadTests();
     } catch (e) {
       print('Lỗi load đề thi: $e');
     }
 
     // Chuyển hướng tới màn hình chính
-    context.pushReplacement('/home');
+    // context.pushReplacement('/home');
+    context.pushReplacement('/main-screen');
   }
 
   @override
   Widget build(BuildContext context) {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
+
     return Scaffold(
       body: Center(
         child: SizedBox(

@@ -36,8 +36,7 @@ class SignItem extends StatelessWidget {
                   // Hiển thị mã biển báo
                   Text(
                     sign.id,
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
                     ),
@@ -45,18 +44,14 @@ class SignItem extends StatelessWidget {
                   // Hiển thị tên biển báo
                   Text(
                     sign.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.titleSmall,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   // Hiển thị mô tả biển báo
                   Text(
                     sign.description,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       color: Colors.grey,
                     ),
                     maxLines: 2,

@@ -202,14 +202,10 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              title: const Center(
+              title: Center(
                 child: Text(
                   'Biển báo giao thông',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
               pinned: true,

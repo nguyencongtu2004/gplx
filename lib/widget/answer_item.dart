@@ -44,18 +44,12 @@ class AnswerItem extends StatelessWidget {
                   : answerState == AnswerState.correct
                   ? Icons.check_circle
                   : Icons.cancel,
-              color: answerState == AnswerState.none
-                  ? Colors.black
-                  : Colors.white,
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 answer,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
           ],

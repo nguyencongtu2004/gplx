@@ -57,19 +57,19 @@ class TestResultItem extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        Icon(Icons.check),
+                        const Icon(Icons.check),
                         Text('$correctCount'),
                       ],
                     ),
                     Column(
                       children: [
-                        Icon(Icons.close),
+                        const Icon(Icons.close),
                         Text('$wrongCount'),
                       ],
                     ),
                     Column(
                       children: [
-                        Icon(Icons.help),
+                        const Icon(Icons.help),
                         Text('$notAnsweredCount'),
                       ],)
                   ],

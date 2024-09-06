@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gplx/screen/chose_licence_class_screen.dart';
 import 'package:gplx/screen/home_screen.dart';
 import 'package:gplx/screen/learn_screen.dart';
+import 'package:gplx/screen/main_screen.dart';
 import 'package:gplx/screen/profile_screen.dart';
 import 'package:gplx/screen/review_screen.dart';
 import 'package:gplx/screen/signs_screen.dart';
@@ -38,6 +39,9 @@ final GoRouter router = GoRouter(
   initialLocation: '/splash',
   navigatorKey: GlobalKey<NavigatorState>(),
   routes: [
+    GoRoute(path: '/main-screen', builder: (context, state) {
+      return const MainScreen();
+    }),
     StatefulShellRoute.indexedStack(
       // Các màn hình chính
       branches: [
@@ -56,7 +60,7 @@ final GoRouter router = GoRouter(
         StatefulShellBranch(navigatorKey: GlobalKey<NavigatorState>(), routes: [
           GoRoute(
             path: '/profile',
-            builder: (context, state) => ProfileScreen(),
+            builder: (context, state) => const ProfileScreen(),
           ),
         ])
       ],

@@ -143,9 +143,9 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
       position: _slideAnimation,
       child: Container(
         height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
+        decoration:  BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(16.0),
             bottomRight: Radius.circular(16.0),
           ),
@@ -224,11 +224,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
           child: Center(
             child: Text(
               kTopic[widget.chapter] ?? 'Câu hỏi',
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
         ),
@@ -251,26 +247,23 @@ class _LearnScreenState extends ConsumerState<LearnScreen>
               },
               icon: Icon(Icons.list,
                   color:
-                      totalQuestion == 0 ? Colors.transparent : Colors.black),
+                      totalQuestion == 0 ? Colors.transparent : null),
             ),
             secondChild: IconButton(
               tooltip: 'Đóng',
               onPressed: () {
                 hideCustomTopSheet();
               },
-              icon: const Icon(Icons.close, color: Colors.black),
+              icon: const Icon(Icons.close),
             ),
           ),
         ],
       ),
       body: totalQuestion == 0
           ? Center(
-              child: const Text(
+              child: Text(
                 'Không có câu hỏi nào',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium,
               )
                   .animate()
                   .fadeIn(duration: 500.ms, curve: Curves.easeInOut)

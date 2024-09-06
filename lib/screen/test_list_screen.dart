@@ -10,12 +10,13 @@ class TestListScreen extends ConsumerWidget {
   const TestListScreen({super.key});
 
   Widget _buildTestItem(
+      BuildContext context,
       {required Center child, required void Function() onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -61,11 +62,7 @@ class TestListScreen extends ConsumerWidget {
         title: Center(
           child: Text(
             'Thi thử - Hạng $licenseClass',
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(context).textTheme.titleLarge,
           ),
         ),
         actions: [
@@ -89,8 +86,11 @@ class TestListScreen extends ConsumerWidget {
         itemCount: 20,
         itemBuilder: (context, index) {
           return _buildTestItem(
+            context,
               child: Center(
-                child: Text('${index + 1}'),
+                child: Text('${index + 1}', style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                )),
               ),
               onTap: () => onTestClick(context, ref, index));
         },

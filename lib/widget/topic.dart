@@ -82,10 +82,8 @@ class TopicItem extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(title,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: titleColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -121,7 +119,7 @@ class TopicItem extends StatelessWidget {
                     child: Text(
                       '$learnedQuestion/$totalQuestion câu hỏi',
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 11,
                       ),
                       textAlign: TextAlign.start,
                     ),

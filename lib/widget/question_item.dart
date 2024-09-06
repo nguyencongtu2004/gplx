@@ -58,10 +58,7 @@ class QuestionItem extends StatelessWidget {
               Expanded(
                 child: Text(
                   question.question,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

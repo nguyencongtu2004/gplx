@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../model/license_class_item.dart';
 import '../provider/license_class_provider.dart';
+import '../provider/settings_provider.dart';
 
 class ChoseLicencesClassScreen extends ConsumerWidget {
   const ChoseLicencesClassScreen({super.key});
@@ -49,17 +50,12 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       Text(
                         'Hạng ${item.title}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
                       Text(
                         item.description,
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 32),
                       OutlinedButton(
@@ -77,11 +73,16 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
 
   Widget _buildLicenseClassItem(BuildContext context, WidgetRef ref,
       LicenseClassItem item, bool isSelected) {
+    final isDarkMode = ref.read(settingsProvider).isDarkMode;
     return InkWell(
       onTap: () => onChoseLicenseClass(context, ref, item),
       onLongPress: () => showLicenseClassDetail(context, ref, item),
       child: Container(
-        color: isSelected ? Colors.grey[200] : null,
+        color: isSelected
+            ? isDarkMode
+                ? Colors.grey[800]
+                : Colors.grey[200]
+            : null,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Row(
@@ -97,19 +98,16 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
                   children: [
                     Text(
                       item.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.titleSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       item.description,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF6B6A6A),
-                      ),
+                      style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                            fontWeight: FontWeight.normal,
+                            color: Colors.grey[600],
+                          ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       softWrap: true,
@@ -124,17 +122,13 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTitleWithDivider(String title) {
+  Widget _buildTitleWithDivider(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              )),
+          Text(title, style: Theme.of(context).textTheme.titleSmall),
           const Divider(),
         ],
       ),
@@ -146,19 +140,17 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
     final String selectedLicenseClass = ref.watch(licenseClassProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
+        title: Center(
           child: Column(
             children: [
               Text(
                 'Chọn hạng thi',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               Text('Ấn giữ để xem chi tiết',
-                  style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                        color: Colors.grey[600],
+                      )),
             ],
           ),
         ),
@@ -182,17 +174,17 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Ô tô
-            _buildTitleWithDivider('Mô tô'),
+            _buildTitleWithDivider(context, 'Mô tô'),
             for (final item in allMotorbikeLicenses)
               _buildLicenseClassItem(
                   context, ref, item, item.title == selectedLicenseClass),
             // Ô tô
-            _buildTitleWithDivider('Ô tô'),
+            _buildTitleWithDivider(context, 'Ô tô'),
             for (final item in allCarLicenses)
               _buildLicenseClassItem(
                   context, ref, item, item.title == selectedLicenseClass),
             // Khác
-            _buildTitleWithDivider('Khác'),
+            _buildTitleWithDivider(context, 'Khác'),
             for (final item in allTruckLicenses)
               _buildLicenseClassItem(
                   context, ref, item, item.title == selectedLicenseClass),
