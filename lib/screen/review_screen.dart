@@ -16,14 +16,19 @@ class ReviewScreen extends ConsumerStatefulWidget {
 
 class _ReviewScreenState extends ConsumerState<ReviewScreen> {
 
-  void onWrongQuestionClick() {
-    print('Câu trả lời sai');
-    context.push('/learn/-4');
+  void onTipsClick() {
+    print('Mẹo làm bài');
+    context.push('/tips');
   }
 
   void onSavedQuestionClick() {
     print('Câu hỏi đã lưu');
     context.push('/learn/-2');
+  }
+
+  void onWrongQuestionClick() {
+    print('Câu trả lời sai');
+    context.push('/learn/-4');
   }
 
   void onHardQuestionClick() {
@@ -112,9 +117,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                             ? MaterialTheme.nenMeo.dark.onColorContainer
                             : MaterialTheme.nenMeo.light.onColorContainer,
                         isVibration: isVibration,
-                        onTap: () {
-                          print('Câu hỏi đã lưu');
-                        }),
+                        onTap: onTipsClick),
                     const SizedBox(height: 16),
                     Text(
                         'Cần chú ý',

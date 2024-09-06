@@ -12,6 +12,7 @@ import 'package:gplx/screen/test_info_screen.dart';
 import 'package:gplx/screen/test_list_screen.dart';
 import 'package:gplx/screen/test_result_screen.dart';
 import 'package:gplx/screen/test_screen.dart';
+import 'package:gplx/screen/tips_screen.dart';
 
 class RoutePage {
   const RoutePage(this.index, this.route, this.title, this.icon,
@@ -141,6 +142,11 @@ final GoRouter router = GoRouter(
         builder: (context, state) {
           final testId = state.pathParameters['testId']!;
           return TestResultScreen(testId: testId);
+        }),
+    GoRoute(
+        path: '/tips',
+        builder: (context, state) {
+          return const TipsScreen();
         }),
   ],
 );

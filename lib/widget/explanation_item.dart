@@ -27,7 +27,7 @@ class ExplanationItem extends StatelessWidget {
     final message = switch (answerState) {
       AnswerState.correct => 'ĐÚNG',
       AnswerState.wrong => 'SAI - Đáp án đúng là số $correctAnswer',
-      AnswerState.none => 'CHƯA CHỌN CÂU TRẢ LỜI',
+      AnswerState.none => 'CHƯA TRẢ LỜI - Đáp án đúng là số $correctAnswer',
       _ => '',
     };
 

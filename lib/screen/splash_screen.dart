@@ -71,9 +71,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var brightness = MediaQuery.of(context).platformBrightness;
-    bool isDarkMode = brightness == Brightness.dark;
-
+    //var brightness = MediaQuery.of(context).platformBrightness;
+    //bool isDarkMode = brightness == Brightness.dark;
     return Scaffold(
       body: Center(
         child: SizedBox(
