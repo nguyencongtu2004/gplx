@@ -345,16 +345,14 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                                   padding: const EdgeInsets.all(0),
                                   onPressed: onPreviousClick,
                                   splashColor: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Icon(Icons.arrow_back_ios),
+                                      const Icon(Icons.arrow_back_ios, color: Colors.black),
                                       Text(
                                         'Câu trước',
-                                        style: TextStyle(
+                                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
                                           color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],
@@ -368,25 +366,23 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                                         !isQuestionListVisible;
                                   });
                                 },
-                                icon: const Icon(Icons.list)),
+                                icon: const Icon(Icons.list, color: Colors.black)),
                             if (isShowNextButton)
                               Expanded(
                                 child: MaterialButton(
                                   padding: const EdgeInsets.all(0),
                                   onPressed: onNextClick,
                                   splashColor: Colors.transparent,
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Text(
                                         'Câu sau ',
-                                        style: TextStyle(
+                                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
                                           color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Icon(Icons.arrow_forward_ios)
+                                      const Icon(Icons.arrow_forward_ios, color: Colors.black)
                                     ],
                                   ),
                                 ),

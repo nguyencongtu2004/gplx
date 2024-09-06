@@ -5,6 +5,7 @@ import 'package:gplx/model/test_information.dart';
 import 'package:gplx/provider/tests_provider.dart';
 
 import '../provider/license_class_provider.dart';
+import '../provider/settings_provider.dart';
 
 class TestInfoScreen extends ConsumerWidget {
   const TestInfoScreen({
@@ -23,6 +24,7 @@ class TestInfoScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final String licenseClass = ref.read(licenseClassProvider);
     final TestInformation testInformation = ref.read(testProvider.notifier).getTestInformation(licenseClass);
+    final isDarkMode = ref.watch(settingsProvider).isDarkMode;
     return Scaffold(
       appBar: AppBar(
         title: const SizedBox(),
@@ -64,21 +66,20 @@ class TestInfoScreen extends ConsumerWidget {
                   textAlign: TextAlign.center),
             ),
             Text('Bài thi số ${testNumber(ref)}',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: Colors.grey
                 ),
                 textAlign: TextAlign.center),
             const SizedBox(height: 36),
-            const Center(
+            Center(
               child: Text('Thông tin bài thi',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  style: Theme.of(context).textTheme.titleSmall),
             ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: isDarkMode ? Colors.grey[900] : Colors.grey[200],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -86,9 +87,7 @@ class TestInfoScreen extends ConsumerWidget {
                   '\nThời gian làm bài: ${testInformation.timeLimit} phút'
                   '\nSố câu đúng tối thiểu: ${testInformation.minimumPassingScore}/${testInformation.totalQuestions} câu'
                   '\nKhi làm sai bất lỳ câu điểm liệt nào, thí sinh sẽ bị trượt.',
-                  style: const TextStyle(
-                    fontSize: 16,
-                  )),
+                  style: Theme.of(context).textTheme.bodyMedium),
             ),
           ],
         ),

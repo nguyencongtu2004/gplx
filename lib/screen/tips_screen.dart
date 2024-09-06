@@ -18,7 +18,10 @@ class TipsScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            style: ButtonStyle(
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+            ),
+            onPressed: null,
             icon: const Icon(
               Icons.list,
               color: Colors.transparent,

@@ -13,7 +13,7 @@ class QuestionListToTest extends StatelessWidget {
   final void Function(int) onQuestionSelected;
   final int selectingPage;
 
-  Widget _buildAnswerTile(AnswerState answerState, int index) {
+  Widget _buildAnswerTile(BuildContext context, AnswerState answerState, int index) {
     final isSelecting = selectingPage == index;
     final String text = (index + 1).toString();
     Color backgroundColor = switch(answerState) {
@@ -42,7 +42,9 @@ class QuestionListToTest extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
             text,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.labelMedium!.copyWith(
+              color: Colors.black,
+            ),
             textAlign: TextAlign.center,),
       ),
     );
@@ -55,7 +57,7 @@ class QuestionListToTest extends StatelessWidget {
       runSpacing: 2,
       children: [
         for (var i = 0; i < questionStatuses.length; i++)
-          _buildAnswerTile(questionStatuses[i], i),
+          _buildAnswerTile(context, questionStatuses[i], i),
       ],
     );
   }

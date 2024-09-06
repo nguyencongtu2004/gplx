@@ -160,7 +160,7 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
             style: ButtonStyle(
               overlayColor: WidgetStateProperty.all(Colors.transparent),
             ),
-            onPressed: () {},
+            onPressed: null,
             icon: const Icon(
               Icons.list,
               color: Colors.transparent,
