@@ -42,9 +42,11 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
                     children: [
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 200),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: AssetImage(item.imageUrl),
+                        child: Image.asset(
+                          item.imageUrl,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -87,9 +89,11 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 25,
-                backgroundImage: AssetImage(item.imageUrl),
+              Image.asset(
+                item.imageUrl,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -97,7 +101,7 @@ class ChoseLicencesClassScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.title,
+                      'Hạng ${item.title}',
                       style: Theme.of(context).textTheme.titleSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

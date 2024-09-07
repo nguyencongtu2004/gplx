@@ -48,26 +48,20 @@ class SignsScreen extends ConsumerStatefulWidget {
                   const SizedBox(height: 10),
                   Text(
                     sign.id,
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
                     ),
                   ),
                   Text(
                     sign.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.titleSmall,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
                   Text(
                     sign.description,
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 10),
                 ],
@@ -250,7 +244,7 @@ class _SignsScreenState extends ConsumerState<SignsScreen>
         body: TabBarView(
           controller: _tabController,
           children: signsPerPage.map((signs) {
-            // không dùng ListView để nó load trước hình ảnh
+            // todo: dùng mixin và pageStorageKey để lưu trạng thái của ListView
             return ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 12),
               key: PageStorageKey<SignCategory>(signs.first.category),

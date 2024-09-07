@@ -224,7 +224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               // todo: fix không cập nhật khi thay đổi dữ liệu
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               title: kTopic[i]!,
-                              imageUrl: 'assets/images/place-holder.png',
+                              imageUrl: 'assets/images/chapters/chapter$i.png',
                               progress: ref.read(questionProvider.notifier).getProgressByTopic(i),
                               correctQuestion: ref.read(questionProvider.notifier).getCorrectQuestionByTopic(i),
                               wrongQuestion: ref.read(questionProvider.notifier).getWrongQuestionByTopic(i),

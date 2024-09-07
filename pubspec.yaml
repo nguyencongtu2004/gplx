@@ -82,6 +82,8 @@ flutter:
     - assets/data/tests.csv
 
     - assets/images/
+    - assets/images/chapters/
+    - assets/images/licenses/
 
     # images of question
     - assets/data/images_of_question/

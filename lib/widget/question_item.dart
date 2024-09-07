@@ -74,7 +74,11 @@ class QuestionItem extends StatelessWidget {
               if (question.isFailingPoint)
               ...[
                 const SizedBox(width: 8),
-                const Icon(Icons.thunderstorm, color: Colors.red),
+                Image.asset(
+                  'assets/images/chapters/chapter0.png',
+                  width: 20,
+                  height: 20,
+                ),
               ],
             ],
           ),

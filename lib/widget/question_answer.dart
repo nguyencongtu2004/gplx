@@ -155,7 +155,11 @@ class _QuestionAnswerState extends ConsumerState<QuestionAnswer> {
                     child: Row(
                       children: [
                         if (currentQuestion.isFailingPoint) ...[
-                          const Icon(Icons.thunderstorm, color: Colors.red),
+                          Image.asset(
+                            'assets/images/chapters/chapter0.png',
+                            width: 18,
+                            height: 18,
+                          ),
                           const SizedBox(width: 4)
                         ],
                         Text('Câu $currentQuestionIndex/$totalQuestion',
