@@ -52,10 +52,19 @@ class _TestScreenState extends ConsumerState<TestScreen> {
     super.initState();
     licenseClass = ref.read(licenseClassProvider);
     allQuestions = ref.read(questionProvider);
-    questionId = ref
+    testId = widget.testId;
+    if (testId == '-1') {
+      questionId = ref
+          .read(testProvider.notifier)
+          .generateTestSet(licenseClass);
+      kTestRandomIds = questionId;
+    }
+    else {
+      questionId = ref
         .read(testProvider)
         .firstWhere((test) => test.id == widget.testId)
         .questions;
+    }
 
     questionStates = List.generate(
         questionId.length,
@@ -64,10 +73,6 @@ class _TestScreenState extends ConsumerState<TestScreen> {
             answerState: AnswerState.none));
     totalQuestion = questionId.length;
     notAnswered = totalQuestion;
-    testId = ref
-        .read(testProvider)
-        .firstWhere((test) => test.id == widget.testId)
-        .id;
     totalTime = ref
             .read(testProvider.notifier)
             .getTestInformation(licenseClass)
@@ -219,9 +224,13 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       notAnswered: notAnswer,
       questionStates: questionStates,
     );
-    ref
-        .read(testProvider.notifier)
-        .updateTestAnswerState(testId, testAnswerState);
+    if (testId == '-1') {
+      kTestRandomAnswerState = testAnswerState;
+    } else {
+      ref
+          .read(testProvider.notifier)
+          .updateTestAnswerState(testId, testAnswerState);
+    }
   }
 
   @override

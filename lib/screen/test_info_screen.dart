@@ -65,7 +65,10 @@ class TestInfoScreen extends ConsumerWidget {
                   ),
                   textAlign: TextAlign.center),
             ),
-            Text('Bài thi số ${testNumber(ref)}',
+            Text(
+              testId == '-1'
+                  ? 'Bài thi ngẫu nhiên'
+                  : 'Bài thi số ${testNumber(ref)}',
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                   color: Colors.grey
                 ),

@@ -80,15 +80,18 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
     _tabController = TabController(length: tabHeaders.length, vsync: this);
 
     allQuestions = ref.read(questionProvider);
-    questionId = ref
-        .read(testProvider)
-        .firstWhere((test) => test.id == widget.testId)
-        .questions;
-    questionStates = ref
-        .read(testProvider)
-        .firstWhere((test) => test.id == widget.testId)
-        .testAnswerState
-        .questionStates!;
+    if (widget.testId == '-1') {
+      questionId = kTestRandomIds!;
+      questionStates = kTestRandomAnswerState!.questionStates!;
+      testResult = kTestRandomAnswerState!.result;
+    } else {
+      final test = ref.read(testProvider).firstWhere((test) => test.id == widget.testId);
+      questionId = test.questions;
+      questionStates = test.testAnswerState.questionStates!;
+      testResult = test.testAnswerState.result;
+    }
+    totalQuestion = questionId.length;
+
     questionIdPerPage = [
       questionId,
       [
@@ -107,13 +110,6 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
             questionId[questionStates.indexOf(state)]
       ],
     ];
-    totalQuestion = questionId.length;
-
-    testResult = ref
-        .read(testProvider)
-        .firstWhere((test) => test.id == widget.testId)
-        .testAnswerState
-        .result;
 
     if (testResult != TestResult.passed) {
       _tabController.animateTo(2);
@@ -344,6 +340,7 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
                 if (tab.isEmpty) {
                   return const Center(child: Text('Không có câu hỏi'));
                 } else {
+                  // todo: sửa thành column
                   return ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: tab.length,
@@ -367,6 +364,7 @@ class _TestResultScreenState extends ConsumerState<TestResultScreen>
                             readOnly: true,
                             isShowNotAnswered: true,
                           ),
+                          // todo: fix bị hiển thị divider đầu tiên
                           if (id != tab.last)
                             const Divider(thickness: 8)
                           else

@@ -280,3 +280,6 @@ class TestProvider extends StateNotifier<List<Test>> {
 final testProvider =
     StateNotifierProvider<TestProvider, List<Test>>(
         (ref) => TestProvider());
+
+TestAnswerState? kTestRandomAnswerState;
+List<int>? kTestRandomIds;
